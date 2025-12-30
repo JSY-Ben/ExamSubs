@@ -60,6 +60,10 @@ body {
     .submission-actions button {
         width: 100%;
     }
+    .submission-actions .btn-sm {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+    }
     .row.g-3 > [class^="col-"] {
         width: 100%;
     }
