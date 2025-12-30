@@ -87,7 +87,9 @@ require __DIR__ . '/header.php';
                 <div class="row g-3">
                     <?php foreach ($documents as $doc): ?>
                         <div class="col-md-6">
-                            <label class="form-label"><?php echo e($doc['title']); ?></label>
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <label class="form-label fw-semibold"><?php echo e($doc['title']); ?></label>
                             <?php
                             $accept = '';
                             if (!empty($doc['require_file_type'])) {
@@ -118,6 +120,8 @@ require __DIR__ . '/header.php';
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
