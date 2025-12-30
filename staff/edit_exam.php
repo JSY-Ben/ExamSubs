@@ -47,6 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newDocsRequire = (array) ($_POST['new_documents_require'] ?? []);
     $newDocsTypes = (array) ($_POST['new_documents_types'] ?? []);
     $deleteDocs = (array) ($_POST['delete_documents'] ?? []);
+    if (is_string($deleteDocs)) {
+        $deleteDocs = array_filter(explode(',', $deleteDocs), static function (string $value): bool {
+            return trim($value) !== '';
+        });
+    }
     $forceDelete = isset($_POST['force_delete']);
 
     foreach ($existingDocs as $docId => $docData) {
@@ -236,6 +241,7 @@ require __DIR__ . '/../header.php';
 
             <form method="post">
                 <input type="hidden" name="delete_confirmed" id="delete-confirmed" value="0">
+                <input type="hidden" name="delete_documents" id="delete-documents" value="">
                 <div class="mb-3">
                     <label class="form-label">Exam ID</label>
                     <input class="form-control" type="text" name="exam_code" value="<?php echo e((string) $exam['exam_code']); ?>" required>
@@ -292,10 +298,7 @@ require __DIR__ . '/../header.php';
                                             <input class="form-check-input" type="checkbox" name="documents[<?php echo (int) $doc['id']; ?>][require]" value="1" id="require-existing-<?php echo (int) $doc['id']; ?>" <?php echo !empty($doc['require_file_type']) ? 'checked' : ''; ?>>
                                             <label class="form-check-label" for="require-existing-<?php echo (int) $doc['id']; ?>">Require these file types</label>
                                         </div>
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" name="delete_documents[]" value="<?php echo (int) $doc['id']; ?>" id="delete-doc-<?php echo (int) $doc['id']; ?>">
-                                            <label class="form-check-label" for="delete-doc-<?php echo (int) $doc['id']; ?>">Delete document</label>
-                                        </div>
+                                        <button class="btn btn-outline-danger btn-sm ms-auto delete-doc-btn" type="button" data-doc-id="<?php echo (int) $doc['id']; ?>">Delete document</button>
                                     </div>
                                 </div>
                             </div>
@@ -413,9 +416,11 @@ require __DIR__ . '/../header.php';
     const documentList = document.getElementById('new-document-list');
     const form = document.querySelector('form');
     const deleteConfirmed = document.getElementById('delete-confirmed');
+    const deleteDocumentsInput = document.getElementById('delete-documents');
     const forceDelete = document.getElementById('force-delete');
     const confirmDeleteDocs = document.getElementById('confirmDeleteDocs');
     const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const deleteDocs = new Set();
 
     const exampleInputs = new Set();
 
@@ -477,7 +482,24 @@ require __DIR__ . '/../header.php';
         newDocIndex += 1;
     });
 
+    document.querySelectorAll('.delete-doc-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const docId = button.dataset.docId;
+            if (!docId) {
+                return;
+            }
+            deleteDocs.add(docId);
+            button.closest('.border')?.classList.add('opacity-50');
+            button.disabled = true;
+            button.textContent = 'Marked for deletion';
+        });
+    });
+
     form.addEventListener('submit', (event) => {
+        if (deleteDocumentsInput) {
+            deleteDocumentsInput.value = Array.from(deleteDocs).join(',');
+        }
+
         if (!forceDelete || !forceDelete.checked) {
             return;
         }
@@ -486,8 +508,7 @@ require __DIR__ . '/../header.php';
             return;
         }
 
-        const deletions = form.querySelectorAll('input[name="delete_documents[]"]:checked');
-        if (deletions.length === 0) {
+        if (deleteDocs.size === 0) {
             return;
         }
 
