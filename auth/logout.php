@@ -7,5 +7,5 @@ require __DIR__ . '/entra.php';
 entra_start_session();
 entra_logout();
 
-header('Location: /index.php');
+header('Location: ../index.php');
 exit;
