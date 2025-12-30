@@ -134,13 +134,13 @@ require __DIR__ . '/../header.php';
             <form method="post">
                 <div class="mb-3">
                     <label class="form-label">Exam ID</label>
-                    <input class="form-control" type="text" name="exam_code" data-example="EXAM-2024-01" value="EXAM-2024-01" required>
+                    <input class="form-control" type="text" name="exam_code" placeholder="EXAM-2024-01" required>
                     <div class="form-text">Example: EXAM-2024-01</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Exam Title</label>
-                    <input class="form-control" type="text" name="title" data-example="Biology Paper 1" value="Biology Paper 1" required>
+                    <input class="form-control" type="text" name="title" placeholder="Biology Paper 1" required>
                     <div class="form-text">Example: Biology Paper 1</div>
                 </div>
 
@@ -198,15 +198,15 @@ require __DIR__ . '/../header.php';
                             <div class="row g-2">
                                 <div class="col-md-4">
                                     <label class="form-label">Document title</label>
-                                    <input class="form-control" type="text" name="documents_title[]" data-example="Activity 1" value="Activity 1" required>
+                                    <input class="form-control" type="text" name="documents_title[]" placeholder="Activity 1" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Student note</label>
-                                    <input class="form-control" type="text" name="documents_note[]" data-example="Make sure to convert to PDF first" value="Make sure to convert to PDF first">
+                                    <input class="form-control" type="text" name="documents_note[]" placeholder="Make sure to convert to PDF first">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Allowed file types</label>
-                                    <input class="form-control" type="text" name="documents_types[]" data-example="pdf, docx" value="pdf, docx">
+                                    <input class="form-control" type="text" name="documents_types[]" placeholder="pdf, docx">
                                     <div class="form-text">Comma-separated extensions.</div>
                                 </div>
                                 <div class="col-12">
@@ -223,8 +223,8 @@ require __DIR__ . '/../header.php';
 
                 <div class="mt-3">
                     <label class="form-label">Submitted Document Naming Convention</label>
-                    <input class="form-control" type="text" name="file_name_template" id="create-file-template" data-example="{candidate_number}_{document_title}_{original_name}" value="{candidate_number}_{document_title}_{original_name}">
-                    <div class="form-text">Example template shown; click to clear.</div>
+                    <input class="form-control" type="text" name="file_name_template" id="create-file-template" placeholder="{candidate_number}_{document_title}_{original_name}">
+                    <div class="form-text">Example: {candidate_number}_{document_title}_{original_name}</div>
                     <div class="form-text d-flex flex-wrap gap-2">
                         <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="create-file-template" data-token="{exam_id}">{exam_id}</button>
                         <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="create-file-template" data-token="{exam_title}">{exam_title}</button>
@@ -241,8 +241,8 @@ require __DIR__ . '/../header.php';
 
                 <div class="mt-3">
                     <label class="form-label">Folder Naming Convention</label>
-                    <input class="form-control" type="text" name="folder_name_template" id="create-folder-template" data-example="{candidate_number}_{student_surname}" value="{candidate_number}_{student_surname}">
-                    <div class="form-text">Example template shown; click to clear.</div>
+                    <input class="form-control" type="text" name="folder_name_template" id="create-folder-template" placeholder="{candidate_number}_{student_surname}">
+                    <div class="form-text">Example: {candidate_number}_{student_surname}</div>
                     <div class="form-text d-flex flex-wrap gap-2">
                         <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="create-folder-template" data-token="{exam_id}">{exam_id}</button>
                         <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="create-folder-template" data-token="{exam_title}">{exam_title}</button>
@@ -274,30 +274,6 @@ require __DIR__ . '/../header.php';
     const startHidden = document.getElementById('start-time-hidden');
     const endHidden = document.getElementById('end-time-hidden');
 
-    const exampleInputs = new Set();
-
-    const initExampleInput = (input) => {
-        if (!input || exampleInputs.has(input)) {
-            return;
-        }
-        exampleInputs.add(input);
-        input.classList.add('text-muted');
-        input.addEventListener('focus', () => {
-            if (input.value === input.dataset.example) {
-                input.value = '';
-                input.classList.remove('text-muted');
-            }
-        });
-        input.addEventListener('blur', () => {
-            if (input.value.trim() === '') {
-                input.value = input.dataset.example;
-                input.classList.add('text-muted');
-            }
-        });
-    };
-
-    document.querySelectorAll('[data-example]').forEach(initExampleInput);
-
     let docIndex = 1;
 
     addButton.addEventListener('click', () => {
@@ -307,15 +283,15 @@ require __DIR__ . '/../header.php';
             <div class="row g-2">
                 <div class="col-md-4">
                     <label class="form-label">Document title</label>
-                    <input class="form-control" type="text" name="documents_title[]" data-example="Activity" value="Activity" required>
+                    <input class="form-control" type="text" name="documents_title[]" placeholder="Activity" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Student note</label>
-                    <input class="form-control" type="text" name="documents_note[]" data-example="Make sure to convert to PDF first" value="Make sure to convert to PDF first">
+                    <input class="form-control" type="text" name="documents_note[]" placeholder="Make sure to convert to PDF first">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Allowed file types</label>
-                    <input class="form-control" type="text" name="documents_types[]" data-example="pdf, docx" value="pdf, docx">
+                    <input class="form-control" type="text" name="documents_types[]" placeholder="pdf, docx">
                     <div class="form-text">Comma-separated extensions.</div>
                 </div>
                 <div class="col-12">
@@ -327,7 +303,6 @@ require __DIR__ . '/../header.php';
             </div>
         `;
         documentList.appendChild(wrapper);
-        wrapper.querySelectorAll('[data-example]').forEach(initExampleInput);
         docIndex += 1;
     });
 
@@ -366,23 +341,6 @@ require __DIR__ . '/../header.php';
         endHidden.value = `${endDate.value}T${end}`;
     });
 
-
-    form.addEventListener('submit', (event) => {
-        let invalid = false;
-        exampleInputs.forEach((input) => {
-            if (input.value === input.dataset.example) {
-                if (input.hasAttribute('required')) {
-                    invalid = true;
-                }
-                input.value = '';
-                input.classList.remove('text-muted');
-            }
-        });
-        if (invalid) {
-            event.preventDefault();
-            alert('Please replace the example text in required fields.');
-        }
-    });
 
     document.querySelectorAll('.token-btn').forEach((button) => {
         button.addEventListener('click', () => {
