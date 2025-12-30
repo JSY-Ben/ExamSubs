@@ -156,7 +156,7 @@ foreach ($rows as $row) {
 }
 ?>
 <main class="container py-4">
-    <div class="mb-4 d-flex justify-content-between align-items-start">
+    <div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
         <div>
             <h1 class="h3"><?php echo e($exam['title']); ?></h1>
             <p class="text-muted">Window: <?php echo e(format_datetime_display($exam['start_time'])); ?> to <?php echo e(format_datetime_display($exam['end_time'])); ?></p>
@@ -165,7 +165,7 @@ foreach ($rows as $row) {
                 <span class="badge text-bg-success">Completed</span>
             <?php endif; ?>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch align-items-md-center submission-actions">
             <?php if (empty($exam['is_completed'])): ?>
                 <form method="post">
                     <input type="hidden" name="action" value="complete">
