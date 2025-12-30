@@ -48,6 +48,15 @@ ALTER TABLE submissions
     ADD COLUMN student_last_name VARCHAR(100) NOT NULL DEFAULT '';
 ```
 
+If you already created tables before document notes and file type rules, run:
+
+```sql
+ALTER TABLE exam_documents
+    ADD COLUMN student_note VARCHAR(500) NULL,
+    ADD COLUMN require_file_type TINYINT(1) NOT NULL DEFAULT 0,
+    ADD COLUMN allowed_file_types VARCHAR(255) NULL;
+```
+
 ## Notes
 
 - File uploads are stored under `uploads/exam_{id}/submission_{id}`.

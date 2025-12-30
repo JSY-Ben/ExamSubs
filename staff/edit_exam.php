@@ -42,12 +42,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $endDt = DateTimeImmutable::createFromFormat('Y-m-d\TH:i', $endTime);
 
     $existingDocs = (array) ($_POST['documents'] ?? []);
-    $newDocs = (array) ($_POST['new_documents'] ?? []);
+    $newDocsTitle = (array) ($_POST['new_documents_title'] ?? []);
+    $newDocsNote = (array) ($_POST['new_documents_note'] ?? []);
+    $newDocsRequire = (array) ($_POST['new_documents_require'] ?? []);
+    $newDocsTypes = (array) ($_POST['new_documents_types'] ?? []);
     $deleteDocs = (array) ($_POST['delete_documents'] ?? []);
     $forceDelete = isset($_POST['force_delete']);
 
-    $existingDocs = array_map('trim', $existingDocs);
-    $newDocs = array_values(array_filter(array_map('trim', $newDocs)));
+    foreach ($existingDocs as $docId => $docData) {
+        if (is_array($docData)) {
+            $existingDocs[$docId]['title'] = trim((string) ($docData['title'] ?? ''));
+            $existingDocs[$docId]['note'] = trim((string) ($docData['note'] ?? ''));
+            $existingDocs[$docId]['require'] = isset($docData['require']) ? 1 : 0;
+            $existingDocs[$docId]['types'] = trim((string) ($docData['types'] ?? ''));
+        } else {
+            $existingDocs[$docId] = [
+                'title' => trim((string) $docData),
+                'note' => '',
+                'require' => 0,
+                'types' => '',
+            ];
+        }
+    }
+
+    $newDocs = [];
+    foreach ($newDocsTitle as $index => $titleValue) {
+        $titleValue = trim((string) $titleValue);
+        if ($titleValue === '') {
+            continue;
+        }
+        $noteValue = trim((string) ($newDocsNote[$index] ?? ''));
+        $requireValue = isset($newDocsRequire[$index]) ? 1 : 0;
+        $typesValue = trim((string) ($newDocsTypes[$index] ?? ''));
+        $newDocs[] = [
+            'title' => $titleValue,
+            'note' => $noteValue,
+            'require' => $requireValue,
+            'types' => $typesValue,
+        ];
+    }
+
     $deleteDocs = array_map('intval', $deleteDocs);
 
     if ($examCode === '' || $title === '' || !$startDt || !$endDt) {
@@ -59,13 +93,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $validExisting = 0;
-    foreach ($existingDocs as $docId => $docTitle) {
+    foreach ($existingDocs as $docId => $docData) {
         $docId = (int) $docId;
         if ((!$hasSubmissions || $forceDelete) && in_array($docId, $deleteDocs, true)) {
             continue;
         }
-        if ($docTitle === '') {
+        if ($docData['title'] === '') {
             $errors[] = 'Document titles cannot be empty.';
+            break;
+        }
+        if ($docData['require'] && $docData['types'] === '') {
+            $errors[] = 'File types are required when file type enforcement is enabled.';
             break;
         }
         $validExisting++;
@@ -100,14 +138,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $order = 1;
-            $updateDoc = $pdo->prepare('UPDATE exam_documents SET title = ?, sort_order = ? WHERE id = ?');
-            foreach ($existingDocs as $docId => $docTitle) {
+            $updateDoc = $pdo->prepare(
+                'UPDATE exam_documents SET title = ?, student_note = ?, require_file_type = ?, allowed_file_types = ?, sort_order = ? WHERE id = ?'
+            );
+            foreach ($existingDocs as $docId => $docData) {
                 $docId = (int) $docId;
                 if ((!$hasSubmissions || $forceDelete) && in_array($docId, $deleteDocs, true)) {
                     continue;
                 }
 
-                $updateDoc->execute([$docTitle, $order, $docId]);
+                $updateDoc->execute([
+                    $docData['title'],
+                    $docData['note'] !== '' ? $docData['note'] : null,
+                    $docData['require'],
+                    $docData['types'] !== '' ? $docData['types'] : null,
+                    $order,
+                    $docId,
+                ]);
                 $order++;
             }
 
@@ -118,9 +165,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (count($newDocs) > 0) {
-                $insertDoc = $pdo->prepare('INSERT INTO exam_documents (exam_id, title, sort_order) VALUES (?, ?, ?)');
-                foreach ($newDocs as $docTitle) {
-                    $insertDoc->execute([$examId, $docTitle, $order]);
+                $insertDoc = $pdo->prepare(
+                    'INSERT INTO exam_documents (exam_id, title, student_note, require_file_type, allowed_file_types, sort_order)
+                     VALUES (?, ?, ?, ?, ?, ?)'
+                );
+                foreach ($newDocs as $doc) {
+                    $insertDoc->execute([
+                        $examId,
+                        $doc['title'],
+                        $doc['note'] !== '' ? $doc['note'] : null,
+                        $doc['require'],
+                        $doc['types'] !== '' ? $doc['types'] : null,
+                        $order,
+                    ]);
                     $order++;
                 }
             }
@@ -224,12 +281,32 @@ try {
                     <label class="form-label">Required Documents</label>
                     <div id="document-list" class="d-grid gap-2">
                         <?php foreach ($documents as $doc): ?>
-                            <div class="input-group">
-                                <input class="form-control" type="text" name="documents[<?php echo (int) $doc['id']; ?>]" value="<?php echo e($doc['title']); ?>" required>
-                                <span class="input-group-text">
-                                    <input class="form-check-input mt-0" type="checkbox" name="delete_documents[]" value="<?php echo (int) $doc['id']; ?>" aria-label="Delete document">
-                                    <span class="ms-2">Delete</span>
-                                </span>
+                            <div class="border rounded p-3">
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Document title</label>
+                                        <input class="form-control" type="text" name="documents[<?php echo (int) $doc['id']; ?>][title]" value="<?php echo e($doc['title']); ?>" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Student note</label>
+                                        <input class="form-control" type="text" name="documents[<?php echo (int) $doc['id']; ?>][note]" value="<?php echo e((string) ($doc['student_note'] ?? '')); ?>" placeholder="Optional note for students">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Allowed file types</label>
+                                        <input class="form-control" type="text" name="documents[<?php echo (int) $doc['id']; ?>][types]" value="<?php echo e((string) ($doc['allowed_file_types'] ?? '')); ?>" placeholder="pdf, docx">
+                                        <div class="form-text">Comma-separated extensions.</div>
+                                    </div>
+                                    <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" name="documents[<?php echo (int) $doc['id']; ?>][require]" value="1" id="require-existing-<?php echo (int) $doc['id']; ?>" <?php echo !empty($doc['require_file_type']) ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="require-existing-<?php echo (int) $doc['id']; ?>">Require these file types</label>
+                                        </div>
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" name="delete_documents[]" value="<?php echo (int) $doc['id']; ?>" id="delete-doc-<?php echo (int) $doc['id']; ?>">
+                                            <label class="form-check-label" for="delete-doc-<?php echo (int) $doc['id']; ?>">Delete document</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -250,7 +327,29 @@ try {
                 <div class="mt-3">
                     <label class="form-label">Add new documents</label>
                     <div id="new-document-list" class="d-grid gap-2">
-                        <input class="form-control" type="text" name="new_documents[]" placeholder="Activity">
+                        <div class="border rounded p-3">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">Document title</label>
+                                    <input class="form-control" type="text" name="new_documents_title[]" placeholder="Activity">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Student note</label>
+                                    <input class="form-control" type="text" name="new_documents_note[]" placeholder="Optional note for students">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Allowed file types</label>
+                                    <input class="form-control" type="text" name="new_documents_types[]" placeholder="pdf, docx">
+                                    <div class="form-text">Comma-separated extensions.</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="new_documents_require[0]" value="1" id="require-new-0">
+                                        <label class="form-check-label" for="require-new-0">Require these file types</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <button class="btn btn-outline-secondary btn-sm mt-2" type="button" id="add-document">Add another document</button>
                 </div>
@@ -325,13 +424,36 @@ try {
     const confirmDeleteDocs = document.getElementById('confirmDeleteDocs');
     const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 
+    let newDocIndex = 1;
+
     addButton.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'new_documents[]';
-        input.placeholder = 'Activity';
-        input.className = 'form-control';
-        documentList.appendChild(input);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'border rounded p-3';
+        wrapper.innerHTML = `
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label">Document title</label>
+                    <input class="form-control" type="text" name="new_documents_title[]" placeholder="Activity">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Student note</label>
+                    <input class="form-control" type="text" name="new_documents_note[]" placeholder="Optional note for students">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Allowed file types</label>
+                    <input class="form-control" type="text" name="new_documents_types[]" placeholder="pdf, docx">
+                    <div class="form-text">Comma-separated extensions.</div>
+                </div>
+                <div class="col-12">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="new_documents_require[${newDocIndex}]" value="1" id="require-new-${newDocIndex}">
+                        <label class="form-check-label" for="require-new-${newDocIndex}">Require these file types</label>
+                    </div>
+                </div>
+            </div>
+        `;
+        documentList.appendChild(wrapper);
+        newDocIndex += 1;
     });
 
     form.addEventListener('submit', (event) => {

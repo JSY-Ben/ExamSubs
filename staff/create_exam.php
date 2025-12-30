@@ -14,11 +14,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $endTime = trim((string) ($_POST['end_time'] ?? ''));
     $bufferPre = (int) ($_POST['buffer_pre_minutes'] ?? 0);
     $bufferPost = (int) ($_POST['buffer_post_minutes'] ?? 0);
-    $documents = $_POST['documents'] ?? [];
+    $documentsTitle = $_POST['documents_title'] ?? [];
+    $documentsNote = $_POST['documents_note'] ?? [];
+    $documentsRequire = $_POST['documents_require'] ?? [];
+    $documentsTypes = $_POST['documents_types'] ?? [];
     $fileNameTemplate = trim((string) ($_POST['file_name_template'] ?? ''));
     $folderNameTemplate = trim((string) ($_POST['folder_name_template'] ?? ''));
 
-    $documents = array_values(array_filter(array_map('trim', (array) $documents)));
+    $documents = [];
+    foreach ((array) $documentsTitle as $index => $titleValue) {
+        $titleValue = trim((string) $titleValue);
+        if ($titleValue === '') {
+            continue;
+        }
+        $noteValue = trim((string) ($documentsNote[$index] ?? ''));
+        $requireValue = isset($documentsRequire[$index]) ? 1 : 0;
+        $typesValue = trim((string) ($documentsTypes[$index] ?? ''));
+        $documents[] = [
+            'title' => $titleValue,
+            'note' => $noteValue !== '' ? $noteValue : null,
+            'require' => $requireValue,
+            'types' => $typesValue !== '' ? $typesValue : null,
+        ];
+    }
 
     if ($examCode === '' || $title === '' || $startTime === '' || $endTime === '') {
         $errors[] = 'Exam ID, title, start time, and end time are required.';
@@ -33,6 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (count($documents) === 0) {
         $errors[] = 'At least one document is required.';
+    }
+
+    foreach ($documents as $doc) {
+        if ($doc['require'] && $doc['types'] === null) {
+            $errors[] = 'File types are required when file type enforcement is enabled.';
+            break;
+        }
     }
 
     if (count($errors) === 0) {
@@ -58,9 +83,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $examId = (int) $pdo->lastInsertId();
 
-            $insertDoc = $pdo->prepare('INSERT INTO exam_documents (exam_id, title, sort_order) VALUES (?, ?, ?)');
-            foreach ($documents as $index => $docTitle) {
-                $insertDoc->execute([$examId, $docTitle, $index + 1]);
+            $insertDoc = $pdo->prepare(
+                'INSERT INTO exam_documents (exam_id, title, student_note, require_file_type, allowed_file_types, sort_order)
+                 VALUES (?, ?, ?, ?, ?, ?)'
+            );
+            foreach ($documents as $index => $doc) {
+                $insertDoc->execute([
+                    $examId,
+                    $doc['title'],
+                    $doc['note'],
+                    $doc['require'],
+                    $doc['types'],
+                    $index + 1,
+                ]);
             }
 
             $pdo->commit();
@@ -163,7 +198,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mt-3">
                     <label class="form-label">Required Documents</label>
                     <div id="document-list" class="d-grid gap-2">
-                        <input class="form-control" type="text" name="documents[]" placeholder="Activity 1" required>
+                        <div class="border rounded p-3">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">Document title</label>
+                                    <input class="form-control" type="text" name="documents_title[]" placeholder="Activity 1" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Student note</label>
+                                    <input class="form-control" type="text" name="documents_note[]" placeholder="Optional note for students">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Allowed file types</label>
+                                    <input class="form-control" type="text" name="documents_types[]" placeholder="pdf, docx">
+                                    <div class="form-text">Comma-separated extensions.</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="documents_require[0]" value="1" id="require-0">
+                                        <label class="form-check-label" for="require-0">Require these file types</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <button class="btn btn-outline-secondary btn-sm mt-2" type="button" id="add-document">Add another document</button>
                 </div>
@@ -219,13 +276,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     const startHidden = document.getElementById('start-time-hidden');
     const endHidden = document.getElementById('end-time-hidden');
 
+    let docIndex = 1;
+
     addButton.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'documents[]';
-        input.placeholder = 'Activity';
-        input.className = 'form-control';
-        documentList.appendChild(input);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'border rounded p-3';
+        wrapper.innerHTML = `
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label">Document title</label>
+                    <input class="form-control" type="text" name="documents_title[]" placeholder="Activity" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Student note</label>
+                    <input class="form-control" type="text" name="documents_note[]" placeholder="Optional note for students">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Allowed file types</label>
+                    <input class="form-control" type="text" name="documents_types[]" placeholder="pdf, docx">
+                    <div class="form-text">Comma-separated extensions.</div>
+                </div>
+                <div class="col-12">
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="documents_require[${docIndex}]" value="1" id="require-${docIndex}">
+                        <label class="form-check-label" for="require-${docIndex}">Require these file types</label>
+                    </div>
+                </div>
+            </div>
+        `;
+        documentList.appendChild(wrapper);
+        docIndex += 1;
     });
 
     const to24Hour = (value, period) => {

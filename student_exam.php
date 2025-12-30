@@ -101,7 +101,19 @@ $documents = $stmt->fetchAll();
                     <?php foreach ($documents as $doc): ?>
                         <div class="col-md-6">
                             <label class="form-label"><?php echo e($doc['title']); ?></label>
-                            <input class="form-control" type="file" name="file_<?php echo (int) $doc['id']; ?>">
+                            <?php
+                            $accept = '';
+                            if (!empty($doc['require_file_type'])) {
+                                $accept = build_accept_attribute($doc['allowed_file_types'] ?? '');
+                            }
+                            ?>
+                            <input class="form-control" type="file" name="file_<?php echo (int) $doc['id']; ?>" <?php echo $accept !== '' ? 'accept="' . e($accept) . '"' : ''; ?>>
+                            <?php if (!empty($doc['student_note'])): ?>
+                                <div class="form-text"><?php echo e($doc['student_note']); ?></div>
+                            <?php endif; ?>
+                            <?php if (!empty($doc['require_file_type']) && !empty($doc['allowed_file_types'])): ?>
+                                <div class="form-text">Allowed types: <?php echo e($doc['allowed_file_types']); ?></div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>

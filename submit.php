@@ -46,6 +46,31 @@ if (count($documents) === 0) {
     exit;
 }
 
+$fileTypeErrors = [];
+foreach ($documents as $doc) {
+    $key = 'file_' . $doc['id'];
+    if (!isset($_FILES[$key]) || $_FILES[$key]['error'] !== UPLOAD_ERR_OK) {
+        continue;
+    }
+
+    if (!empty($doc['require_file_type'])) {
+        $allowedTypes = parse_allowed_file_types($doc['allowed_file_types'] ?? '');
+        if (count($allowedTypes) > 0) {
+            $originalName = (string) $_FILES[$key]['name'];
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            if ($ext === '' || !in_array($ext, $allowedTypes, true)) {
+                $fileTypeErrors[] = $doc['title'];
+            }
+        }
+    }
+}
+
+if (count($fileTypeErrors) > 0) {
+    http_response_code(422);
+    echo 'Invalid file type for: ' . e(implode(', ', $fileTypeErrors));
+    exit;
+}
+
 $uploadedCount = 0;
 foreach ($documents as $doc) {
     $key = 'file_' . $doc['id'];

@@ -74,3 +74,40 @@ function ensure_original_extension(string $value, string $originalName): string
 
     return $value;
 }
+
+function parse_allowed_file_types(?string $value): array
+{
+    $value = strtolower(trim((string) $value));
+    if ($value === '') {
+        return [];
+    }
+
+    $parts = preg_split('/[\\s,]+/', $value);
+    $types = [];
+    foreach ($parts as $part) {
+        $part = trim($part);
+        if ($part === '') {
+            continue;
+        }
+        $part = ltrim($part, '.');
+        if ($part === '') {
+            continue;
+        }
+        $types[] = $part;
+    }
+
+    return array_values(array_unique($types));
+}
+
+function build_accept_attribute(?string $value): string
+{
+    $types = parse_allowed_file_types($value);
+    if (count($types) === 0) {
+        return '';
+    }
+    $parts = array_map(static function (string $type): string {
+        return '.' . $type;
+    }, $types);
+
+    return implode(',', $parts);
+}

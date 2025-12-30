@@ -17,6 +17,9 @@ CREATE TABLE exam_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exam_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
+    student_note VARCHAR(500) NULL,
+    require_file_type TINYINT(1) NOT NULL DEFAULT 0,
+    allowed_file_types VARCHAR(255) NULL,
     sort_order INT NOT NULL DEFAULT 0,
     CONSTRAINT fk_exam_documents_exam
         FOREIGN KEY (exam_id)
