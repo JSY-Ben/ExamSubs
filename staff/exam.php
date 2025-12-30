@@ -17,6 +17,22 @@ if (!$exam) {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = (string) ($_POST['action'] ?? '');
+    if ($action === 'complete') {
+        $stmt = db()->prepare('UPDATE exams SET is_completed = 1, completed_at = ? WHERE id = ?');
+        $stmt->execute([now_utc_string(), $examId]);
+        header('Location: exam.php?id=' . $examId);
+        exit;
+    }
+    if ($action === 'reopen') {
+        $stmt = db()->prepare('UPDATE exams SET is_completed = 0, completed_at = NULL WHERE id = ?');
+        $stmt->execute([$examId]);
+        header('Location: exam.php?id=' . $examId);
+        exit;
+    }
+}
+
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
 $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
@@ -73,7 +89,18 @@ foreach ($rows as $row) {
                 <span class="badge text-bg-success">Completed</span>
             <?php endif; ?>
         </div>
-        <div>
+        <div class="d-flex gap-2">
+            <?php if (empty($exam['is_completed'])): ?>
+                <form method="post">
+                    <input type="hidden" name="action" value="complete">
+                    <button class="btn btn-outline-success btn-sm" type="submit">Mark Completed</button>
+                </form>
+            <?php else: ?>
+                <form method="post">
+                    <input type="hidden" name="action" value="reopen">
+                    <button class="btn btn-outline-primary btn-sm" type="submit">Reopen</button>
+                </form>
+            <?php endif; ?>
             <a class="btn btn-outline-secondary btn-sm" href="index.php">Back to list</a>
         </div>
     </div>

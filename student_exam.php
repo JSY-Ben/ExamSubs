@@ -13,8 +13,41 @@ $stmt->execute([$examId]);
 $exam = $stmt->fetch();
 
 if (!$exam || !exam_is_active($exam, $now)) {
-    http_response_code(404);
-    echo 'Exam not available.';
+    if (!$exam) {
+        http_response_code(404);
+        echo 'Exam not found.';
+        exit;
+    }
+
+    $statusMessage = !empty($exam['is_completed'])
+        ? 'This exam has been marked as completed and is no longer accepting submissions.'
+        : 'This exam is not currently accepting submissions.';
+    ?>
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Exam Unavailable</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+    <nav class="navbar navbar-expand-lg bg-white border-bottom">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="index.php">Exam Submission Portal</a>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="alert alert-warning shadow-sm">
+            <h1 class="h5 mb-2">Exam unavailable</h1>
+            <p class="mb-3"><?php echo e($statusMessage); ?></p>
+            <a class="btn btn-outline-secondary btn-sm" href="index.php">Back to active exams</a>
+        </div>
+    </main>
+    </body>
+    </html>
+    <?php
     exit;
 }
 

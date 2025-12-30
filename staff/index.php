@@ -30,6 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if ($action === 'reopen') {
+        $examId = (int) ($_POST['exam_id'] ?? 0);
+        if ($examId > 0) {
+            $stmt = db()->prepare('UPDATE exams SET is_completed = 0, completed_at = NULL WHERE id = ?');
+            $stmt->execute([$examId]);
+        }
+        header('Location: index.php');
+        exit;
+    }
+
     $title = trim((string) ($_POST['title'] ?? ''));
     $startTime = trim((string) ($_POST['start_time'] ?? ''));
     $endTime = trim((string) ($_POST['end_time'] ?? ''));
@@ -190,6 +200,12 @@ $exams = $stmt->fetchAll();
                                                     <input type="hidden" name="action" value="complete">
                                                     <input type="hidden" name="exam_id" value="<?php echo (int) $exam['id']; ?>">
                                                     <button class="btn btn-outline-success btn-sm" type="submit">Mark Completed</button>
+                                                </form>
+                                            <?php else: ?>
+                                                <form method="post">
+                                                    <input type="hidden" name="action" value="reopen">
+                                                    <input type="hidden" name="exam_id" value="<?php echo (int) $exam['id']; ?>">
+                                                    <button class="btn btn-outline-primary btn-sm" type="submit">Reopen</button>
                                                 </form>
                                             <?php endif; ?>
                                             <form method="post" onsubmit="return confirm('Delete this exam and all submissions?');">
