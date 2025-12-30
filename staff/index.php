@@ -124,7 +124,7 @@ $exams = $stmt->fetchAll();
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Exams</h1>
-        <a class="btn btn-primary btn-sm" href="create_exam.php">Create Exam</a>
+        <a class="btn btn-primary btn-lg" href="create_exam.php">Create Exam</a>
     </div>
 
     <div class="card shadow-sm mb-4">
