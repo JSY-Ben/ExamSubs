@@ -4,7 +4,7 @@ Please note - this app is still in an alpha stage of development as a product. I
 
 ![ScreenshotOfApp](https://github.com/user-attachments/assets/7c2a07ef-3b3a-4811-98c7-a3bf7c71e8e1)
 
-ExamSubs is a lightweight PHP/MySQL web portal for managing exam submissions for an education institution. Students can upload required files through a simple form, while staff can define exams, collect submissions, and review uploaded materials from a dedicated dashboard. The system keeps uploads organised by exam and submission to make retrieval and auditing straightforward.
+ExamSubs is a lightweight PHP/MySQL web portal for managing exam submissions for an education institution. Students can upload required files through a simple form, while staff can define exams, including what files and file types are expected to be submitted, collect submissions, and review uploaded materials from a dedicated dashboard. The system keeps uploads organised by exam and submission to make retrieval and auditing straightforward.
 
 ## Setup
 
