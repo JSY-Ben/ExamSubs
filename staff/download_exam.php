@@ -62,6 +62,16 @@ foreach ($files as $file) {
     $lastInitial = $file['student_last_name'] !== '' ? substr($file['student_last_name'], 0, 1) : '';
     $fullName = trim($file['student_first_name'] . ' ' . $file['student_last_name']);
     $fallbackName = $fullName !== '' ? $fullName : $file['student_name'];
+    $rootFolder = apply_name_template(
+        $file['folder_name_template'] ?? '',
+        [
+            'exam_id' => $examIdentifier,
+            'exam_title' => $file['exam_title'],
+        ],
+        $file['exam_title']
+    );
+    $rootFolder = sanitize_name_component($rootFolder);
+
     $folder = apply_name_template(
         $file['folder_name_template'] ?? '',
         [
@@ -97,7 +107,7 @@ foreach ($files as $file) {
     $fileName = ensure_original_extension($fileName, $file['original_name']);
     $fileName = sanitize_name_component($fileName);
 
-    $zip->addFile($realPath, $folder . '/' . $fileName);
+    $zip->addFile($realPath, $rootFolder . '/' . $folder . '/' . $fileName);
 }
 
 $zip->close();
