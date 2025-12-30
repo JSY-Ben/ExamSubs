@@ -13,4 +13,5 @@ return [
         'charset' => 'utf8mb4',
     ],
     'uploads_dir' => __DIR__ . '/uploads',
+    'debug' => true,
 ];

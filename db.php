@@ -20,10 +20,18 @@ function db(): PDO
         $db['charset']
     );
 
-    $pdo = new PDO($dsn, $db['user'], $db['pass'], [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    try {
+        $pdo = new PDO($dsn, $db['user'], $db['pass'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    } catch (PDOException $e) {
+        $message = 'Database connection failed.';
+        if (!empty($config['debug'])) {
+            $message .= ' ' . $e->getMessage();
+        }
+        throw new RuntimeException($message, 0, $e);
+    }
 
     return $pdo;
 }
