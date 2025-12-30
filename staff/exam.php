@@ -20,6 +20,14 @@ if (!$exam) {
     exit;
 }
 
+$pageTitle = 'Exam - ' . $exam['title'];
+$brandHref = 'index.php';
+$brandText = 'Staff';
+$logoPath = '../logo.png';
+$cssPath = '../style.css';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>';
+require __DIR__ . '/../header.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = (string) ($_POST['action'] ?? '');
     if ($action === 'complete') {
@@ -145,26 +153,6 @@ foreach ($rows as $row) {
     }
 }
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Exam - <?php echo e($exam['title']); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="../style.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-        <a class="navbar-brand fw-semibold" href="index.php">
-            <img src="../logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
-            Staff
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>
-    </div>
-</nav>
-
 <main class="container py-4">
     <div class="mb-4 d-flex justify-content-between align-items-start">
         <div>
@@ -268,5 +256,4 @@ foreach ($rows as $row) {
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/../footer.php'; ?>

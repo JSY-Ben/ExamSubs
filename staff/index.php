@@ -104,27 +104,14 @@ $sql .= ' ORDER BY start_time DESC';
 $stmt = db()->prepare($sql);
 $stmt->execute($params);
 $exams = $stmt->fetchAll();
+$pageTitle = 'Staff - Exam Portal';
+$brandHref = 'index.php';
+$brandText = 'Staff';
+$logoPath = '../logo.png';
+$cssPath = '../style.css';
+$navActions = '';
+require __DIR__ . '/../header.php';
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Staff - Exam Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="../style.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-        <a class="navbar-brand fw-semibold" href="../index.php">
-            <img src="../logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
-            Exam Submission Portal
-        </a>
-        <span class="navbar-text">Staff</span>
-    </div>
-</nav>
-
 <main class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4 mb-0">Exams</h1>
@@ -218,5 +205,4 @@ $exams = $stmt->fetchAll();
         </div>
     </div>
 </main>
-</body>
-</html>
+<?php require __DIR__ . '/../footer.php'; ?>

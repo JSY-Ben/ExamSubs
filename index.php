@@ -14,27 +14,14 @@ foreach ($stmt->fetchAll() as $exam) {
         $exams[] = $exam;
     }
 }
+$pageTitle = 'Exam Submission Portal';
+$brandHref = 'index.php';
+$brandText = 'Exam Submission Portal';
+$logoPath = 'logo.png';
+$cssPath = 'style.css';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Staff</a>';
+require __DIR__ . '/header.php';
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Exam Submission Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-        <span class="navbar-brand fw-semibold">
-            <img src="logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
-            Exam Submission Portal
-        </span>
-        <a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Staff</a>
-    </div>
-</nav>
-
 <main class="container py-4">
     <div class="mb-4">
         <h1 class="h3">Active Exams</h1>
@@ -63,5 +50,4 @@ foreach ($stmt->fetchAll() as $exam) {
         </div>
     <?php endif; ?>
 </main>
-</body>
-</html>
+<?php require __DIR__ . '/footer.php'; ?>

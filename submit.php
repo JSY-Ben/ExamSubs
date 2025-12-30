@@ -190,31 +190,18 @@ try {
     echo 'Upload failed. Please try again.';
     exit;
 }
+$pageTitle = 'Submission Received';
+$brandHref = 'index.php';
+$brandText = 'Exam Submission Portal';
+$logoPath = 'logo.png';
+$cssPath = 'style.css';
+$navActions = '';
+require __DIR__ . '/header.php';
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Submission Received</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-        <a class="navbar-brand fw-semibold" href="index.php">
-            <img src="logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
-            Exam Submission Portal
-        </a>
-    </div>
-</nav>
-
 <main class="container py-5">
     <div class="alert alert-success shadow-sm">
         <h1 class="h4 mb-2">Submission received</h1>
         <p class="mb-0">Your files have been submitted successfully.</p>
     </div>
 </main>
-</body>
-</html>
+<?php require __DIR__ . '/footer.php'; ?>

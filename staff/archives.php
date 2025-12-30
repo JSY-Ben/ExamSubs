@@ -85,27 +85,14 @@ unset($student);
 uasort($students, function (array $a, array $b): int {
     return strcasecmp($a['name'], $b['name']);
 });
+$pageTitle = 'Archived Submissions - ' . $exam['title'];
+$brandHref = 'index.php';
+$brandText = 'Staff';
+$logoPath = '../logo.png';
+$cssPath = '../style.css';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="exam.php?id=' . (int) $exam['id'] . '">Back to exam</a>';
+require __DIR__ . '/../header.php';
 ?>
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Archived Submissions - <?php echo e($exam['title']); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="../style.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg bg-white border-bottom">
-    <div class="container">
-        <a class="navbar-brand fw-semibold" href="index.php">
-            <img src="../logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
-            Staff
-        </a>
-        <a class="btn btn-outline-secondary btn-sm" href="exam.php?id=<?php echo (int) $exam['id']; ?>">Back to exam</a>
-    </div>
-</nav>
-
 <main class="container py-4">
     <div class="mb-4">
         <h1 class="h4">Archived Submissions</h1>
@@ -167,5 +154,4 @@ uasort($students, function (array $a, array $b): int {
     </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/../footer.php'; ?>
