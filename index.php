@@ -22,6 +22,7 @@ foreach ($stmt->fetchAll() as $exam) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Exam Submission Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">

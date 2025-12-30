@@ -1,0 +1,70 @@
+:root {
+    --portal-bg-1: #f7f2ea;
+    --portal-bg-2: #efe7db;
+    --portal-panel: #fffaf3;
+    --portal-border: #d9cdbf;
+    --portal-accent: #b4834a;
+    --portal-text: #3a2e1f;
+}
+
+body {
+    background: linear-gradient(180deg, var(--portal-bg-1), var(--portal-bg-2));
+    color: var(--portal-text);
+}
+
+.navbar {
+    border-bottom-color: var(--portal-border) !important;
+}
+
+.card,
+.list-group-item,
+.table {
+    border-color: var(--portal-border) !important;
+}
+
+.card {
+    background-color: #fff;
+    box-shadow: 0 8px 20px rgba(60, 41, 22, 0.08);
+}
+
+.list-group-item {
+    background-color: var(--portal-panel);
+}
+
+.border.rounded.p-3 {
+    background-color: var(--portal-panel);
+    border-color: var(--portal-border) !important;
+}
+
+.form-control,
+.form-select {
+    background-color: #fffef9;
+    border-color: var(--portal-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--portal-accent);
+    box-shadow: 0 0 0 0.2rem rgba(180, 131, 74, 0.2);
+}
+
+.form-label {
+    font-weight: 600;
+}
+
+.btn-primary {
+    box-shadow: 0 6px 14px rgba(180, 131, 74, 0.25);
+}
+
+.alert {
+    border-color: var(--portal-border);
+}
+
+.table th,
+.table td {
+    border-color: var(--portal-border);
+}
+
+.dropdown-menu {
+    border-color: var(--portal-border);
+}
