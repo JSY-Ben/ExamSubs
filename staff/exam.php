@@ -58,8 +58,8 @@ foreach ($rows as $row) {
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/staff/index.php">Staff</a>
-        <a class="btn btn-outline-secondary btn-sm" href="/index.php">Student View</a>
+        <a class="navbar-brand fw-semibold" href="index.php">Staff</a>
+        <a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>
     </div>
 </nav>
 
@@ -106,7 +106,7 @@ foreach ($rows as $row) {
                         <?php else: ?>
                             <div class="list-group">
                                 <?php foreach ($submission['files'] as $file): ?>
-                                    <a class="list-group-item list-group-item-action" href="/staff/download.php?id=<?php echo (int) $file['file_id']; ?>">
+                                    <a class="list-group-item list-group-item-action" href="download.php?id=<?php echo (int) $file['file_id']; ?>">
                                         <?php echo e($file['document_title']); ?> — <?php echo e($file['original_name']); ?>
                                     </a>
                                 <?php endforeach; ?>

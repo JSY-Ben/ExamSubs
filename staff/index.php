@@ -80,7 +80,7 @@ $exams = $stmt->fetchAll();
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/index.php">Exam Submission Portal</a>
+        <a class="navbar-brand fw-semibold" href="../index.php">Exam Submission Portal</a>
         <span class="navbar-text">Staff</span>
     </div>
 </nav>
@@ -152,7 +152,7 @@ $exams = $stmt->fetchAll();
                     <?php else: ?>
                         <div class="list-group list-group-flush">
                             <?php foreach ($exams as $exam): ?>
-                                <a class="list-group-item list-group-item-action" href="/staff/exam.php?id=<?php echo (int) $exam['id']; ?>">
+                                <a class="list-group-item list-group-item-action" href="exam.php?id=<?php echo (int) $exam['id']; ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="fw-semibold"><?php echo e($exam['title']); ?></div>

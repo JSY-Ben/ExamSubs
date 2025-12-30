@@ -33,7 +33,7 @@ $documents = $stmt->fetchAll();
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/index.php">Exam Submission Portal</a>
+        <a class="navbar-brand fw-semibold" href="index.php">Exam Submission Portal</a>
     </div>
 </nav>
 
@@ -43,7 +43,7 @@ $documents = $stmt->fetchAll();
         <p class="text-muted">Upload all required files before the submission window ends.</p>
     </div>
 
-    <form class="card shadow-sm" action="/submit.php" method="post" enctype="multipart/form-data">
+    <form class="card shadow-sm" action="submit.php" method="post" enctype="multipart/form-data">
         <div class="card-body">
             <input type="hidden" name="exam_id" value="<?php echo (int) $exam['id']; ?>">
 

@@ -130,7 +130,7 @@ try {
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="/index.php">Exam Submission Portal</a>
+        <a class="navbar-brand fw-semibold" href="index.php">Exam Submission Portal</a>
     </div>
 </nav>
 

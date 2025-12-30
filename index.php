@@ -27,7 +27,7 @@ foreach ($stmt->fetchAll() as $exam) {
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
         <span class="navbar-brand fw-semibold">Exam Submission Portal</span>
-        <a class="btn btn-outline-secondary btn-sm" href="/staff/index.php">Staff</a>
+        <a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Staff</a>
     </div>
 </nav>
 
@@ -49,7 +49,7 @@ foreach ($stmt->fetchAll() as $exam) {
                             <p class="text-muted mb-3">
                                 Window: <?php echo e($exam['start_time']); ?> to <?php echo e($exam['end_time']); ?>
                             </p>
-                            <a class="btn btn-primary" href="/student_exam.php?id=<?php echo (int) $exam['id']; ?>">
+                            <a class="btn btn-primary" href="student_exam.php?id=<?php echo (int) $exam['id']; ?>">
                                 Submit Files
                             </a>
                         </div>
