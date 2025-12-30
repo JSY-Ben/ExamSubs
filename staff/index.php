@@ -55,8 +55,11 @@ $conditions = [];
 $params = [];
 
 if ($search !== '') {
-    $conditions[] = '(title LIKE ? OR exam_code LIKE ?)';
+    $conditions[] = '(title LIKE ? OR exam_code LIKE ? OR EXISTS (SELECT 1 FROM submissions s WHERE s.exam_id = exams.id AND (s.student_first_name LIKE ? OR s.student_last_name LIKE ? OR s.student_name LIKE ?)))';
     $like = '%' . $search . '%';
+    $params[] = $like;
+    $params[] = $like;
+    $params[] = $like;
     $params[] = $like;
     $params[] = $like;
 }
@@ -171,7 +174,7 @@ $exams = $stmt->fetchAll();
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form class="row g-3" method="get">
-                <div class="col-md-4">
+                <div class="col-12">
                     <label class="form-label">Search</label>
                     <input class="form-control" type="text" name="q" placeholder="Exam title or ID" value="<?php echo e($search); ?>">
                 </div>
@@ -190,10 +193,6 @@ $exams = $stmt->fetchAll();
                 <div class="col-md-2">
                     <label class="form-label">End Date</label>
                     <input class="form-control" type="date" name="end_date" value="<?php echo e($endDate); ?>">
-                </div>
-                <div class="col-md-1 d-grid">
-                    <label class="form-label invisible">Apply</label>
-                    <button class="btn btn-outline-primary" type="submit">Apply</button>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">End date start</label>
@@ -235,6 +234,9 @@ $exams = $stmt->fetchAll();
                         <option value="has" <?php echo $submissionsFilter === 'has' ? 'selected' : ''; ?>>Has submissions</option>
                         <option value="none" <?php echo $submissionsFilter === 'none' ? 'selected' : ''; ?>>No submissions</option>
                     </select>
+                </div>
+                <div class="col-12 d-grid">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
                 </div>
                 <div class="col-12">
                     <a class="btn btn-link px-0" href="index.php">Reset filters</a>
