@@ -14,12 +14,12 @@ foreach ($stmt->fetchAll() as $exam) {
         $exams[] = $exam;
     }
 }
-$pageTitle = 'Exam Submission Portal';
+$pageTitle = 'Exams Submission Portal';
 $brandHref = 'index.php';
-$brandText = 'Exam Submission Portal';
+$brandText = 'Exams Submission Portal';
 $logoPath = 'logo.png';
 $cssPath = 'style.css';
-$navActions = '<a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Staff</a>';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Exam Administration</a>';
 require __DIR__ . '/header.php';
 ?>
 <main class="container py-4">

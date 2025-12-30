@@ -24,7 +24,7 @@ if (!$exam || !exam_is_active($exam, $now)) {
         : 'This exam is not currently accepting submissions.';
     $pageTitle = 'Exam Unavailable';
     $brandHref = 'index.php';
-    $brandText = 'Exam Submission Portal';
+    $brandText = 'Exams Submission Portal';
     $logoPath = 'logo.png';
     $cssPath = 'style.css';
     $navActions = '';
@@ -47,7 +47,7 @@ $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
 $pageTitle = 'Submit Files - ' . $exam['title'];
 $brandHref = 'index.php';
-$brandText = 'Exam Submission Portal';
+$brandText = 'Exams Submission Portal';
 $logoPath = 'logo.png';
 $cssPath = 'style.css';
 $navActions = '';

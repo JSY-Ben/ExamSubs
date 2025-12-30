@@ -192,7 +192,7 @@ try {
 }
 $pageTitle = 'Submission Received';
 $brandHref = 'index.php';
-$brandText = 'Exam Submission Portal';
+$brandText = 'Exams Submission Portal';
 $logoPath = 'logo.png';
 $cssPath = 'style.css';
 $navActions = '';
