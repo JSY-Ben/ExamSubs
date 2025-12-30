@@ -109,7 +109,7 @@ require __DIR__ . '/header.php';
                                 : '';
                             ?>
                             <?php if ($noteText !== '' || $typesText !== ''): ?>
-                                <div class="alert alert-light border py-2 mb-2 d-flex flex-wrap gap-3 align-items-center">
+                                <div class="alert border py-2 mb-2 d-flex flex-wrap gap-3 align-items-center doc-note-banner">
                                     <?php if ($noteText !== ''): ?>
                                         <div><strong>Note:</strong> <?php echo e($noteText); ?></div>
                                     <?php endif; ?>

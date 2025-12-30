@@ -37,6 +37,11 @@ body {
     background-color: #e7f3f6;
 }
 
+.doc-note-banner {
+    background-color: #e3f6f9;
+    border-color: #b6e2ea;
+}
+
 .navbar {
     border-bottom-color: var(--portal-border) !important;
 }
