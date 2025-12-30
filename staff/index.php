@@ -139,7 +139,16 @@ require __DIR__ . '/../header.php';
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form class="row g-3" method="get">
+            <div class="accordion" id="filterAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="filterHeading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                            Filters
+                        </button>
+                    </h2>
+                    <div id="filterCollapse" class="accordion-collapse collapse" aria-labelledby="filterHeading" data-bs-parent="#filterAccordion">
+                        <div class="accordion-body">
+                            <form class="row g-3" method="get">
                 <div class="col-12">
                     <label class="form-label">Search</label>
                     <input class="form-control" type="text" name="q" placeholder="Exam title or ID" value="<?php echo e($search); ?>">
@@ -185,10 +194,14 @@ require __DIR__ . '/../header.php';
                 <div class="col-12 d-grid">
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
-                <div class="col-12">
-                    <a class="btn btn-link px-0" href="index.php">Reset filters</a>
+                                <div class="col-12">
+                                    <a class="btn btn-link px-0" href="index.php">Reset filters</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
