@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../auth/require_auth.php';
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../helpers.php';
 
@@ -25,7 +26,8 @@ $brandHref = 'index.php';
 $brandText = 'Exams Administration Portal';
 $logoPath = '../logo.png';
 $cssPath = '../style.css';
-$navActions = '<a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>'
+    . '<a class="btn btn-outline-secondary btn-sm" href="/auth/logout.php">Logout</a>';
 require __DIR__ . '/../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

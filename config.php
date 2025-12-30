@@ -14,4 +14,11 @@ return [
     ],
     'uploads_dir' => __DIR__ . '/uploads',
     'debug' => true,
+    'entra' => [
+        'tenant_id' => 'YOUR_TENANT_ID',
+        'client_id' => 'YOUR_CLIENT_ID',
+        'client_secret' => 'YOUR_CLIENT_SECRET',
+        'redirect_uri' => 'https://your-domain.example.com/auth/callback.php',
+        'scope' => 'openid profile email',
+    ],
 ];

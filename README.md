@@ -68,3 +68,7 @@ ALTER TABLE exam_documents
 
 - File uploads are stored under `uploads/exam_{id}/submission_{id}`.
 - Configure PHP upload limits (`upload_max_filesize`, `post_max_size`) if needed.
+
+## Staff Authentication
+
+See `README-auth.md` for Microsoft Entra setup.

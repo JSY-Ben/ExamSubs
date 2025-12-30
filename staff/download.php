@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require __DIR__ . '/../auth/require_auth.php';
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../helpers.php';
 
