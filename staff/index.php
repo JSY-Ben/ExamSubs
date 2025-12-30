@@ -117,7 +117,10 @@ $exams = $stmt->fetchAll();
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="../index.php">Exam Submission Portal</a>
+        <a class="navbar-brand fw-semibold" href="../index.php">
+            <img src="../logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
+            Exam Submission Portal
+        </a>
         <span class="navbar-text">Staff</span>
     </div>
 </nav>

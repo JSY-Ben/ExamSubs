@@ -157,7 +157,10 @@ foreach ($rows as $row) {
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-semibold" href="index.php">Staff</a>
+        <a class="navbar-brand fw-semibold" href="index.php">
+            <img src="../logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
+            Staff
+        </a>
         <a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>
     </div>
 </nav>

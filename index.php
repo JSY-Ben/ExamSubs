@@ -27,7 +27,10 @@ foreach ($stmt->fetchAll() as $exam) {
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <span class="navbar-brand fw-semibold">Exam Submission Portal</span>
+        <span class="navbar-brand fw-semibold">
+            <img src="logo.png" alt="Highlands logo" width="28" height="28" class="me-2">
+            Exam Submission Portal
+        </span>
         <a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Staff</a>
     </div>
 </nav>
