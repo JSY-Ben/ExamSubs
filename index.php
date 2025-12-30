@@ -47,7 +47,7 @@ foreach ($stmt->fetchAll() as $exam) {
                         <div class="card-body">
                             <h2 class="h5 mb-2"><?php echo e($exam['title']); ?></h2>
                             <p class="text-muted mb-3">
-                                Window: <?php echo e($exam['start_time']); ?> to <?php echo e($exam['end_time']); ?>
+                                Window: <?php echo e(format_datetime_display($exam['start_time'])); ?> to <?php echo e(format_datetime_display($exam['end_time'])); ?>
                             </p>
                             <a class="btn btn-primary" href="student_exam.php?id=<?php echo (int) $exam['id']; ?>">
                                 Submit Files

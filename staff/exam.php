@@ -66,7 +66,7 @@ foreach ($rows as $row) {
 <main class="container py-4">
     <div class="mb-4">
         <h1 class="h3"><?php echo e($exam['title']); ?></h1>
-        <p class="text-muted">Window: <?php echo e($exam['start_time']); ?> to <?php echo e($exam['end_time']); ?></p>
+        <p class="text-muted">Window: <?php echo e(format_datetime_display($exam['start_time'])); ?> to <?php echo e(format_datetime_display($exam['end_time'])); ?></p>
         <p class="text-muted">Buffers: <?php echo (int) $exam['buffer_pre_minutes']; ?> mins before, <?php echo (int) $exam['buffer_post_minutes']; ?> mins after</p>
     </div>
 
@@ -99,7 +99,7 @@ foreach ($rows as $row) {
                                 <div class="fw-semibold"><?php echo e($submission['info']['student_name']); ?></div>
                                 <small class="text-muted">Candidate: <?php echo e($submission['info']['candidate_number']); ?></small>
                             </div>
-                            <small class="text-muted">Submitted: <?php echo e($submission['info']['submitted_at']); ?></small>
+                            <small class="text-muted">Submitted: <?php echo e(format_datetime_display($submission['info']['submitted_at'])); ?></small>
                         </div>
                         <?php if (count($submission['files']) === 0): ?>
                             <p class="text-muted mb-0">No files uploaded.</p>

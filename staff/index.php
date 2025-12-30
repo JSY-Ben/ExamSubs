@@ -156,7 +156,7 @@ $exams = $stmt->fetchAll();
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="fw-semibold"><?php echo e($exam['title']); ?></div>
-                                            <small class="text-muted"><?php echo e($exam['start_time']); ?> to <?php echo e($exam['end_time']); ?></small>
+                                            <small class="text-muted"><?php echo e(format_datetime_display($exam['start_time'])); ?> to <?php echo e(format_datetime_display($exam['end_time'])); ?></small>
                                         </div>
                                         <span class="badge text-bg-secondary">View</span>
                                     </div>

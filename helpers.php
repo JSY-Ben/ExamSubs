@@ -22,3 +22,13 @@ function exam_is_active(array $exam, DateTimeImmutable $now): bool
 
     return $now >= $start && $now <= $end;
 }
+
+function format_datetime_display(string $value): string
+{
+    $dt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value);
+    if (!$dt) {
+        return $value;
+    }
+
+    return $dt->format('d/m/Y g:i A');
+}
