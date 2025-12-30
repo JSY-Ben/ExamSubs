@@ -103,10 +103,14 @@ require __DIR__ . '/header.php';
                             <div class="form-text text-danger d-none" id="error-<?php echo (int) $doc['id']; ?>"></div>
                             <button class="btn btn-outline-danger btn-sm mt-2 d-none remove-upload" type="button" data-doc-id="<?php echo (int) $doc['id']; ?>">Remove uploaded file</button>
                             <?php if (!empty($doc['student_note'])): ?>
-                                <div class="form-text"><?php echo e($doc['student_note']); ?></div>
+                                <div class="alert alert-info py-2 mb-2">
+                                    <strong>Note:</strong> <?php echo e($doc['student_note']); ?>
+                                </div>
                             <?php endif; ?>
                             <?php if (!empty($doc['require_file_type']) && !empty($doc['allowed_file_types'])): ?>
-                                <div class="form-text">Allowed types: <?php echo e($doc['allowed_file_types']); ?></div>
+                                <div class="alert alert-light border py-2 mb-2">
+                                    <strong>Required file types:</strong> <?php echo e($doc['allowed_file_types']); ?>
+                                </div>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
