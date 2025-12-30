@@ -6,6 +6,7 @@ $brandText = $brandText ?? 'Exam Submission Portal';
 $logoPath = $logoPath ?? 'logo.png';
 $cssPath = $cssPath ?? 'style.css';
 $navActions = $navActions ?? '';
+$pageScripts = $pageScripts ?? '';
 
 ?>
 <!doctype html>
@@ -31,3 +32,6 @@ $navActions = $navActions ?? '';
         <?php endif; ?>
     </div>
 </nav>
+<?php if ($pageScripts !== ''): ?>
+    <?php echo $pageScripts; ?>
+<?php endif; ?>
