@@ -43,12 +43,6 @@ $search = trim((string) ($_GET['q'] ?? ''));
 $status = (string) ($_GET['status'] ?? 'all');
 $startDate = trim((string) ($_GET['start_date'] ?? ''));
 $endDate = trim((string) ($_GET['end_date'] ?? ''));
-$endStartDate = trim((string) ($_GET['end_start_date'] ?? ''));
-$endEndDate = trim((string) ($_GET['end_end_date'] ?? ''));
-$examIdExact = trim((string) ($_GET['exam_id_exact'] ?? ''));
-$activeWindow = (string) ($_GET['active_window'] ?? 'no');
-$upcomingOnly = (string) ($_GET['upcoming_only'] ?? 'no');
-$completedDays = trim((string) ($_GET['completed_days'] ?? ''));
 $submissionsFilter = (string) ($_GET['submissions'] ?? 'all');
 
 $conditions = [];
@@ -68,6 +62,10 @@ if ($status === 'completed') {
     $conditions[] = 'is_completed = 1';
 } elseif ($status === 'active') {
     $conditions[] = 'is_completed = 0';
+    $conditions[] = 'NOW() BETWEEN DATE_SUB(start_time, INTERVAL buffer_pre_minutes MINUTE) AND DATE_ADD(end_time, INTERVAL buffer_post_minutes MINUTE)';
+} elseif ($status === 'upcoming') {
+    $conditions[] = 'is_completed = 0';
+    $conditions[] = 'start_time > NOW()';
 }
 
 $startBoundary = null;
@@ -88,48 +86,6 @@ if ($endDate !== '') {
         $endBoundary = $endDt->format('Y-m-d 23:59:59');
         $conditions[] = 'start_time <= ?';
         $params[] = $endBoundary;
-    }
-}
-
-if ($endStartDate !== '') {
-    $endStartDt = DateTimeImmutable::createFromFormat('Y-m-d', $endStartDate);
-    if ($endStartDt) {
-        $endStartBoundary = $endStartDt->format('Y-m-d 00:00:00');
-        $conditions[] = 'end_time >= ?';
-        $params[] = $endStartBoundary;
-    }
-}
-
-if ($endEndDate !== '') {
-    $endEndDt = DateTimeImmutable::createFromFormat('Y-m-d', $endEndDate);
-    if ($endEndDt) {
-        $endEndBoundary = $endEndDt->format('Y-m-d 23:59:59');
-        $conditions[] = 'end_time <= ?';
-        $params[] = $endEndBoundary;
-    }
-}
-
-if ($examIdExact !== '') {
-    $conditions[] = 'exam_code = ?';
-    $params[] = $examIdExact;
-}
-
-if ($activeWindow === 'yes') {
-    $conditions[] = 'is_completed = 0';
-    $conditions[] = 'NOW() BETWEEN DATE_SUB(start_time, INTERVAL buffer_pre_minutes MINUTE) AND DATE_ADD(end_time, INTERVAL buffer_post_minutes MINUTE)';
-}
-
-if ($upcomingOnly === 'yes') {
-    $conditions[] = 'is_completed = 0';
-    $conditions[] = 'start_time > NOW()';
-}
-
-if ($completedDays !== '') {
-    $days = (int) $completedDays;
-    if ($days > 0) {
-        $conditions[] = 'is_completed = 1';
-        $conditions[] = 'completed_at >= DATE_SUB(NOW(), INTERVAL ? DAY)';
-        $params[] = $days;
     }
 }
 
@@ -182,8 +138,9 @@ $exams = $stmt->fetchAll();
                     <label class="form-label">Status</label>
                     <select class="form-select" name="status">
                         <option value="all" <?php echo $status === 'all' ? 'selected' : ''; ?>>All</option>
-                        <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>Active only</option>
-                        <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed only</option>
+                        <option value="upcoming" <?php echo $status === 'upcoming' ? 'selected' : ''; ?>>Upcoming</option>
+                        <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>Active</option>
+                        <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -193,39 +150,6 @@ $exams = $stmt->fetchAll();
                 <div class="col-md-2">
                     <label class="form-label">End Date</label>
                     <input class="form-control" type="date" name="end_date" value="<?php echo e($endDate); ?>">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">End date start</label>
-                    <input class="form-control" type="date" name="end_start_date" value="<?php echo e($endStartDate); ?>">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">End date end</label>
-                    <input class="form-control" type="date" name="end_end_date" value="<?php echo e($endEndDate); ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Exam ID exact</label>
-                    <input class="form-control" type="text" name="exam_id_exact" value="<?php echo e($examIdExact); ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Active window</label>
-                    <select class="form-select" name="active_window">
-                        <option value="no" <?php echo $activeWindow === 'no' ? 'selected' : ''; ?>>No filter</option>
-                        <option value="yes" <?php echo $activeWindow === 'yes' ? 'selected' : ''; ?>>Only active now</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Upcoming only</label>
-                    <select class="form-select" name="upcoming_only">
-                        <option value="no" <?php echo $upcomingOnly === 'no' ? 'selected' : ''; ?>>No filter</option>
-                        <option value="yes" <?php echo $upcomingOnly === 'yes' ? 'selected' : ''; ?>>Upcoming</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Completed within</label>
-                    <div class="input-group">
-                        <input class="form-control" type="number" name="completed_days" min="1" placeholder="Days" value="<?php echo e($completedDays); ?>">
-                        <span class="input-group-text">days</span>
-                    </div>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Submissions</label>
