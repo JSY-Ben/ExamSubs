@@ -143,7 +143,7 @@ require __DIR__ . '/../header.php';
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="filterHeading">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-                            Filters
+                            Search & Filters
                         </button>
                     </h2>
                     <div id="filterCollapse" class="accordion-collapse collapse" aria-labelledby="filterHeading" data-bs-parent="#filterAccordion">
