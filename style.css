@@ -36,11 +36,11 @@ body {
 }
 
 .list-group-item .fw-semibold {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
 }
 
 .list-group-item small {
-    font-size: 0.95rem;
+    font-size: 1.02rem;
 }
 
 .border.rounded.p-3 {
