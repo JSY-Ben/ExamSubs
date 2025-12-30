@@ -192,7 +192,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-3">
-                    <label class="form-label">Required Documents</label>
+                    <h2 class="h6 text-uppercase fw-bold mb-2">Required Documents</h2>
                     <div id="document-list" class="d-grid gap-2">
                         <div class="border rounded p-3">
                             <div class="row g-2">

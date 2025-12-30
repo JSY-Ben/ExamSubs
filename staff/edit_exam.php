@@ -278,7 +278,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4">
-                    <label class="form-label">Required Documents</label>
+                    <h2 class="h6 text-uppercase fw-bold mb-2">Required Documents</h2>
                     <div id="document-list" class="d-grid gap-2">
                         <?php foreach ($documents as $doc): ?>
                             <div class="border rounded p-3">
@@ -322,7 +322,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-3">
-                    <label class="form-label">Add new documents</label>
+                    <h2 class="h6 text-uppercase fw-bold mb-2">Add New Documents</h2>
                     <div id="new-document-list" class="d-grid gap-2">
                         <div class="border rounded p-3">
                             <div class="row g-2">
