@@ -24,7 +24,7 @@ require __DIR__ . '/header.php';
 ?>
 <main class="container py-4">
     <div class="mb-4">
-        <h1 class="h3">Active Exams</h1>
+        <h1 class="h3">Today's Exam(s)</h1>
         <p class="text-muted">Only exams currently open for submissions are shown.</p>
     </div>
 
