@@ -118,8 +118,17 @@ function entra_fetch_jwks(): array
     }
 
     $jwksUrl = sprintf('https://login.microsoftonline.com/%s/discovery/v2.0/keys', rawurlencode($config['tenant_id']));
-    $raw = file_get_contents($jwksUrl);
+    $ch = curl_init($jwksUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+    ]);
+    $raw = curl_exec($ch);
     if ($raw === false) {
+        throw new RuntimeException('Failed to fetch JWKS.');
+    }
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($status !== 200) {
         throw new RuntimeException('Failed to fetch JWKS.');
     }
 
@@ -130,6 +139,41 @@ function entra_fetch_jwks(): array
     }
 
     return $jwks;
+}
+
+function entra_asn1_length(int $length): string
+{
+    if ($length <= 0x7f) {
+        return chr($length);
+    }
+    $temp = ltrim(pack('N', $length), \"\\x00\");
+    return chr(0x80 | strlen($temp)) . $temp;
+}
+
+function entra_asn1_integer(string $value): string
+{
+    if (ord($value[0]) > 0x7f) {
+        $value = \"\\x00\" . $value;
+    }
+    return \"\\x02\" . entra_asn1_length(strlen($value)) . $value;
+}
+
+function entra_jwk_to_pem(array $key): string
+{
+    $modulus = entra_base64url_decode($key['n']);
+    $exponent = entra_base64url_decode($key['e']);
+    $rsaKey = \"\\x30\" . entra_asn1_length(strlen(entra_asn1_integer($modulus)) + strlen(entra_asn1_integer($exponent)))
+        . entra_asn1_integer($modulus)
+        . entra_asn1_integer($exponent);
+
+    $bitString = \"\\x03\" . entra_asn1_length(strlen($rsaKey) + 1) . \"\\x00\" . $rsaKey;
+    $algId = \"\\x30\\x0d\\x06\\x09\\x2a\\x86\\x48\\x86\\xf7\\x0d\\x01\\x01\\x01\\x05\\x00\";
+    $spki = \"\\x30\" . entra_asn1_length(strlen($algId) + strlen($bitString)) . $algId . $bitString;
+
+    $pem = \"-----BEGIN PUBLIC KEY-----\\n\";
+    $pem .= chunk_split(base64_encode($spki), 64, \"\\n\");
+    $pem .= \"-----END PUBLIC KEY-----\\n\";
+    return $pem;
 }
 
 function entra_verify_id_token(string $jwt): array
@@ -163,11 +207,7 @@ function entra_verify_id_token(string $jwt): array
         throw new RuntimeException('Signing key not found.');
     }
 
-    $publicKey = openssl_pkey_get_public([
-        'kty' => 'RSA',
-        'n' => $key['n'],
-        'e' => $key['e'],
-    ]);
+    $publicKey = openssl_pkey_get_public(entra_jwk_to_pem($key));
 
     if (!$publicKey) {
         throw new RuntimeException('Invalid signing key.');

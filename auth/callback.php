@@ -11,7 +11,12 @@ $code = (string) ($_GET['code'] ?? '');
 $error = (string) ($_GET['error'] ?? '');
 
 if ($error !== '') {
-    echo 'Login failed.';
+    $config = require __DIR__ . '/../config.php';
+    if (!empty($config['debug'])) {
+        echo 'Login failed: ' . htmlspecialchars($error, ENT_QUOTES, 'UTF-8');
+    } else {
+        echo 'Login failed.';
+    }
     exit;
 }
 
@@ -44,6 +49,11 @@ try {
     header('Location: ' . $returnTo);
     exit;
 } catch (Throwable $e) {
-    echo 'Login failed.';
+    $config = require __DIR__ . '/../config.php';
+    if (!empty($config['debug'])) {
+        echo 'Login failed: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+    } else {
+        echo 'Login failed.';
+    }
     exit;
 }
