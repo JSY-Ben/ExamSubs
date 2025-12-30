@@ -59,6 +59,25 @@ body {
     box-shadow: 0 6px 14px rgba(31, 122, 140, 0.25);
 }
 
+.btn-outline-secondary {
+    border-color: var(--portal-accent);
+    color: var(--portal-accent);
+    background-color: #ffffff;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+    color: #ffffff;
+    background-color: var(--portal-accent);
+    border-color: var(--portal-accent);
+}
+
+.btn-outline-secondary:active {
+    color: #ffffff;
+    background-color: #176272;
+    border-color: #176272;
+}
+
 .alert {
     border-color: var(--portal-border);
 }
