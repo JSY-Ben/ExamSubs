@@ -109,15 +109,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($fileId <= 0) {
             continue;
         }
-        $title = is_array($fileData) ? trim((string) ($fileData['title'] ?? '')) : trim((string) $fileData);
+        $fileTitle = is_array($fileData) ? trim((string) ($fileData['title'] ?? '')) : trim((string) $fileData);
         if (in_array($fileId, $deleteExamFiles, true)) {
             continue;
         }
-        if ($title === '') {
+        if ($fileTitle === '') {
             $errors[] = 'Exam file titles cannot be empty.';
             break;
         }
-        $existingExamFileTitles[$fileId] = $title;
+        $existingExamFileTitles[$fileId] = $fileTitle;
     }
 
     if ($examCode === '' || $title === '' || !$startDt || !$endDt) {
@@ -153,10 +153,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newExamFilesToStore = [];
     if (count($errors) === 0 && !empty($_FILES['new_exam_files_file']) && is_array($_FILES['new_exam_files_file']['name'])) {
         foreach ($_FILES['new_exam_files_file']['name'] as $index => $name) {
-            $title = trim((string) ($newExamFilesTitle[$index] ?? ''));
+            $fileTitle = trim((string) ($newExamFilesTitle[$index] ?? ''));
             $error = (int) ($_FILES['new_exam_files_file']['error'][$index] ?? UPLOAD_ERR_NO_FILE);
             if ($error === UPLOAD_ERR_NO_FILE) {
-                if ($title !== '') {
+                if ($fileTitle !== '') {
                     $errors[] = 'Exam file title requires a file upload.';
                     break;
                 }
@@ -166,12 +166,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Problem uploading exam files.';
                 break;
             }
-            if ($title === '') {
+            if ($fileTitle === '') {
                 $errors[] = 'Exam file title is required when uploading a file.';
                 break;
             }
             $newExamFilesToStore[] = [
-                'title' => $title,
+                'title' => $fileTitle,
                 'original_name' => (string) $name,
                 'tmp_name' => (string) ($_FILES['new_exam_files_file']['tmp_name'][$index] ?? ''),
                 'size' => (int) ($_FILES['new_exam_files_file']['size'][$index] ?? 0),
