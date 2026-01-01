@@ -250,6 +250,11 @@ try {
         (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'),
     ]);
 
+    $pendingKey = 'pending_submission_' . $examId;
+    if (isset($_SESSION[$pendingKey])) {
+        unset($_SESSION[$pendingKey]);
+    }
+
     $submissionId = (int) $pdo->lastInsertId();
     $examFolder = $uploadsDir . '/exam_' . $examId;
     $submissionFolder = $examFolder . '/submission_' . $submissionId;

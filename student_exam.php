@@ -140,7 +140,7 @@ if (!$rosterEnabled) {
     $rosterMode = '';
 }
 $prefill = null;
-if (!$rosterEnabled) {
+if (!$rosterEnabled && $replaceRequested) {
     $sessionKey = 'pending_submission_' . $examId;
     if (isset($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
         $prefill = $_SESSION[$sessionKey];
