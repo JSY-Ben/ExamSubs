@@ -72,7 +72,7 @@ $pageScripts = <<<HTML
         padding-bottom: 0;
         --bs-gutter-x: 0;
         --bs-gutter-y: 0;
-        --card-height: calc((297mm - 28mm - 8mm) / 3);
+        --card-height: 80mm;
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
         padding: 0 !important;
@@ -95,7 +95,22 @@ $pageScripts = <<<HTML
         overflow: hidden;
     }
     .student-card .card-body {
-        padding: 6mm 8mm;
+        padding: 5mm 7mm;
+    }
+    .student-card h2 {
+        font-size: 1.05rem;
+        margin-bottom: 4mm;
+    }
+    .student-card .label {
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+    }
+    .student-card .value {
+        font-size: 0.95rem;
+    }
+    .student-card .password {
+        font-size: 1.05rem;
+        letter-spacing: 0.14em;
     }
     .student-card h2 {
         margin-bottom: 6mm;
