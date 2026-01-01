@@ -145,19 +145,6 @@ if ($replaceRequested) {
     if (!$rosterEnabled && isset($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
         $prefill = $_SESSION[$sessionKey];
     }
-} else {
-    $sessionKey = 'pending_submission_' . $examId;
-    if (isset($_SESSION[$sessionKey])) {
-        unset($_SESSION[$sessionKey]);
-    }
-    $pendingTokensKey = 'pending_upload_tokens_' . $examId;
-    if (isset($_SESSION[$pendingTokensKey])) {
-        unset($_SESSION[$pendingTokensKey]);
-    }
-    $pendingNamesKey = 'pending_upload_names_' . $examId;
-    if (isset($_SESSION[$pendingNamesKey])) {
-        unset($_SESSION[$pendingNamesKey]);
-    }
 }
 if ($rosterEnabled && $rosterMode === 'password') {
     $rosterSessionKey = 'exam_roster_student_' . $examId;
