@@ -293,6 +293,23 @@ foreach ($documents as $doc) {
     }
 }
 
+if ($uploadedCount === 0 && $replaceConfirmed) {
+    $pendingTokensKey = 'pending_upload_tokens_' . $examId;
+    if (isset($_SESSION[$pendingTokensKey]) && is_array($_SESSION[$pendingTokensKey])) {
+        foreach ($_SESSION[$pendingTokensKey] as $docId => $token) {
+            $docId = (int) $docId;
+            if (isset($tokens[$docId])) {
+                continue;
+            }
+            $token = trim((string) $token);
+            if ($token !== '' && preg_match('/^[a-f0-9]{32}$/', $token)) {
+                $tokens[$docId] = $token;
+                $uploadedCount++;
+            }
+        }
+    }
+}
+
 if ($uploadedCount === 0) {
     http_response_code(422);
     echo 'Please upload at least one file.';
