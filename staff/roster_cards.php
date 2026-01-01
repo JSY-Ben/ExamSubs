@@ -84,9 +84,8 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: 60mm !important;
+        height: 62mm;
         box-sizing: border-box;
-        overflow: hidden;
     }
 
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col:last-child {
@@ -125,7 +124,7 @@ require __DIR__ . '/../header.php';
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-2">
         <?php foreach ($students as $student): ?>
             <div class="col">
-                <div class="card shadow-sm h-100 student-card">
+                <div class="card shadow-sm student-card">
                     <div class="card-body">
                         <div class="label mb-1">Student</div>
                         <h2 class="h5 mb-3"><?php echo e(trim($student['student_first_name'] . ' ' . $student['student_last_name'])); ?></h2>
