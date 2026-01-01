@@ -153,6 +153,57 @@ $stmt->execute([$examId, $candidateNumber, $studentFirstName, $studentLastName])
 $existingSubmissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 if (count($existingSubmissions) > 0 && !$replaceConfirmed) {
+    foreach ($documents as $doc) {
+        $docId = (int) $doc['id'];
+        if (isset($tokens[$docId])) {
+            continue;
+        }
+        $key = 'file_' . $docId;
+        if (!isset($_FILES[$key]) || $_FILES[$key]['error'] !== UPLOAD_ERR_OK) {
+            continue;
+        }
+
+        if (!empty($doc['require_file_type'])) {
+            $allowedTypes = parse_allowed_file_types($doc['allowed_file_types'] ?? '');
+            if (count($allowedTypes) > 0) {
+                $originalName = (string) $_FILES[$key]['name'];
+                $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                if ($ext === '' || !in_array($ext, $allowedTypes, true)) {
+                    http_response_code(422);
+                    echo 'Invalid file type for: ' . e($doc['title']);
+                    exit;
+                }
+            }
+        }
+
+        if (!is_dir($tmpDir) && !mkdir($tmpDir, 0755, true)) {
+            http_response_code(500);
+            echo 'Unable to prepare upload directory.';
+            exit;
+        }
+
+        $token = bin2hex(random_bytes(16));
+        $tmpFile = $tmpDir . '/' . $token . '.upload';
+        $tmpMeta = $tmpDir . '/' . $token . '.json';
+
+        if (!move_uploaded_file($_FILES[$key]['tmp_name'], $tmpFile)) {
+            http_response_code(500);
+            echo 'Upload failed.';
+            exit;
+        }
+
+        $metadata = [
+            'exam_id' => $examId,
+            'doc_id' => $docId,
+            'original_name' => (string) $_FILES[$key]['name'],
+            'file_size' => (int) $_FILES[$key]['size'],
+            'uploaded_at' => (new DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
+        ];
+
+        file_put_contents($tmpMeta, json_encode($metadata, JSON_PRETTY_PRINT));
+        $tokens[$docId] = $token;
+    }
+
     if (!$rosterEnabled) {
         $sessionKey = 'pending_submission_' . $examId;
         $_SESSION[$sessionKey] = [
