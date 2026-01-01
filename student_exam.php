@@ -320,9 +320,10 @@ require __DIR__ . '/header.php';
 
             <div class="d-flex flex-wrap gap-2">
                 <button class="btn btn-primary" type="submit">Submit Files</button>
-                <button class="btn btn-outline-secondary" type="submit" formnovalidate formaction="cancel_submission.php" formmethod="post">
-                    Cancel submission
-                </button>
+                <form action="cancel_submission.php" method="post">
+                    <input type="hidden" name="exam_id" value="<?php echo (int) $exam['id']; ?>">
+                    <button class="btn btn-outline-secondary" type="submit">Cancel submission</button>
+                </form>
             </div>
         </div>
     </form>
