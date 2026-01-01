@@ -176,6 +176,7 @@ require __DIR__ . '/header.php';
     const rosterField = document.getElementById('examPasswordRosterField');
     const examPasswordInput = examField?.querySelector('input');
     const rosterPasswordInput = rosterField?.querySelector('input');
+    const preauthForm = document.querySelector('#examPasswordModal form');
 
     const openPreauthModal = (button, returnTo) => {
         const examId = button.dataset.examId;
@@ -229,5 +230,11 @@ require __DIR__ . '/header.php';
             openPreauthModal(link, link.getAttribute('href'));
         }
     });
+
+    if (preauthForm) {
+        preauthForm.addEventListener('submit', () => {
+            preauthModal.hide();
+        });
+    }
 </script>
 <?php require __DIR__ . '/footer.php'; ?>
