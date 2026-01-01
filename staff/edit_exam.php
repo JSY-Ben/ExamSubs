@@ -58,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newDocsTypes = (array) ($_POST['new_documents_types'] ?? []);
     $deleteDocs = (array) ($_POST['delete_documents'] ?? []);
     $deleteExamFiles = (array) ($_POST['delete_exam_files'] ?? []);
+    $existingExamFiles = (array) ($_POST['exam_files'] ?? []);
+    $newExamFilesTitle = (array) ($_POST['new_exam_files_title'] ?? []);
     if (is_string($deleteDocs)) {
         $deleteDocs = array_filter(explode(',', $deleteDocs), static function (string $value): bool {
             return trim($value) !== '';
@@ -99,6 +101,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $deleteDocs = array_map('intval', $deleteDocs);
+    $deleteExamFiles = array_map('intval', $deleteExamFiles);
+
+    $existingExamFileTitles = [];
+    foreach ($existingExamFiles as $fileId => $fileData) {
+        $fileId = (int) $fileId;
+        if ($fileId <= 0) {
+            continue;
+        }
+        $title = is_array($fileData) ? trim((string) ($fileData['title'] ?? '')) : trim((string) $fileData);
+        if (in_array($fileId, $deleteExamFiles, true)) {
+            continue;
+        }
+        if ($title === '') {
+            $errors[] = 'Exam file titles cannot be empty.';
+            break;
+        }
+        $existingExamFileTitles[$fileId] = $title;
+    }
 
     if ($examCode === '' || $title === '' || !$startDt || !$endDt) {
         $errors[] = 'Exam ID, title, start time, and end time are required.';
@@ -128,6 +148,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $totalDocs = $validExisting + count($newDocs);
     if ($totalDocs === 0) {
         $errors[] = 'At least one document is required.';
+    }
+
+    $newExamFilesToStore = [];
+    if (count($errors) === 0 && !empty($_FILES['new_exam_files_file']) && is_array($_FILES['new_exam_files_file']['name'])) {
+        foreach ($_FILES['new_exam_files_file']['name'] as $index => $name) {
+            $title = trim((string) ($newExamFilesTitle[$index] ?? ''));
+            $error = (int) ($_FILES['new_exam_files_file']['error'][$index] ?? UPLOAD_ERR_NO_FILE);
+            if ($error === UPLOAD_ERR_NO_FILE) {
+                if ($title !== '') {
+                    $errors[] = 'Exam file title requires a file upload.';
+                    break;
+                }
+                continue;
+            }
+            if ($error !== UPLOAD_ERR_OK) {
+                $errors[] = 'Problem uploading exam files.';
+                break;
+            }
+            if ($title === '') {
+                $errors[] = 'Exam file title is required when uploading a file.';
+                break;
+            }
+            $newExamFilesToStore[] = [
+                'title' => $title,
+                'original_name' => (string) $name,
+                'tmp_name' => (string) ($_FILES['new_exam_files_file']['tmp_name'][$index] ?? ''),
+                'size' => (int) ($_FILES['new_exam_files_file']['size'][$index] ?? 0),
+            ];
+        }
     }
 
     if (count($errors) === 0) {
@@ -206,7 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $deleteExamFiles = array_map('intval', $deleteExamFiles);
             $deletedFilePaths = [];
             if (count($deleteExamFiles) > 0) {
                 $placeholders = implode(',', array_fill(0, count($deleteExamFiles), '?'));
@@ -218,28 +266,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $deleteStmt->execute(array_merge([$examId], $deleteExamFiles));
             }
 
-            if (!empty($_FILES['exam_files']) && is_array($_FILES['exam_files']['name'])) {
+            if (count($existingExamFileTitles) > 0) {
+                $updateFile = $pdo->prepare('UPDATE exam_files SET title = ? WHERE id = ? AND exam_id = ?');
+                foreach ($existingExamFileTitles as $fileId => $title) {
+                    $updateFile->execute([$title, $fileId, $examId]);
+                }
+            }
+
+            if (count($newExamFilesToStore) > 0) {
                 $examFilesDir = $uploadsDir . '/exam_' . $examId . '/exam_files';
                 if (!is_dir($examFilesDir) && !mkdir($examFilesDir, 0755, true)) {
                     throw new RuntimeException('Unable to create exam files directory.');
                 }
                 $insertFile = $pdo->prepare(
-                    'INSERT INTO exam_files (exam_id, original_name, stored_name, stored_path, file_size, uploaded_at)
-                     VALUES (?, ?, ?, ?, ?, ?)'
+                    'INSERT INTO exam_files (exam_id, title, original_name, stored_name, stored_path, file_size, uploaded_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?)'
                 );
-                foreach ($_FILES['exam_files']['name'] as $index => $name) {
-                    if (!isset($_FILES['exam_files']['error'][$index])) {
-                        continue;
-                    }
-                    $error = (int) $_FILES['exam_files']['error'][$index];
-                    if ($error === UPLOAD_ERR_NO_FILE) {
-                        continue;
-                    }
-                    if ($error !== UPLOAD_ERR_OK) {
-                        throw new RuntimeException('Problem uploading exam files.');
-                    }
-                    $tmpName = (string) ($_FILES['exam_files']['tmp_name'][$index] ?? '');
-                    $originalName = (string) $name;
+                foreach ($newExamFilesToStore as $file) {
+                    $tmpName = $file['tmp_name'];
+                    $originalName = $file['original_name'];
                     $storedName = uniqid('exam_file_', true) . '_' . sanitize_name_component($originalName);
                     $storedPath = $examFilesDir . '/' . $storedName;
                     if (!move_uploaded_file($tmpName, $storedPath)) {
@@ -248,10 +293,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $relativePath = str_replace($uploadsDir . '/', '', $storedPath);
                     $insertFile->execute([
                         $examId,
+                        $file['title'],
                         $originalName,
                         $storedName,
                         $relativePath,
-                        (int) ($_FILES['exam_files']['size'][$index] ?? 0),
+                        $file['size'],
                         now_utc_string(),
                     ]);
                 }
@@ -500,6 +546,7 @@ require __DIR__ . '/../header.php';
                             <table class="table table-sm align-middle">
                                 <thead>
                                     <tr>
+                                        <th>Title</th>
                                         <th>File</th>
                                         <th>Size</th>
                                         <th>Delete</th>
@@ -508,7 +555,10 @@ require __DIR__ . '/../header.php';
                                 <tbody>
                                     <?php foreach ($examFiles as $file): ?>
                                         <tr>
-                                            <td><?php echo e($file['original_name']); ?></td>
+                                            <td>
+                                                <input class="form-control form-control-sm" type="text" name="exam_files[<?php echo (int) $file['id']; ?>][title]" value="<?php echo e($file['title'] !== '' ? $file['title'] : $file['original_name']); ?>" required>
+                                            </td>
+                                            <td class="text-muted"><?php echo e($file['original_name']); ?></td>
                                             <td class="text-muted"><?php echo e(format_bytes((int) $file['file_size'])); ?></td>
                                             <td>
                                                 <input class="form-check-input" type="checkbox" name="delete_exam_files[]" value="<?php echo (int) $file['id']; ?>">
@@ -519,8 +569,26 @@ require __DIR__ . '/../header.php';
                             </table>
                         </div>
                     <?php endif; ?>
-                    <input class="form-control" type="file" name="exam_files[]" multiple>
-                    <div class="form-text">Upload additional files for students to download.</div>
+
+                    <div class="mt-3">
+                        <h3 class="h6 text-uppercase fw-bold mb-2">Add New Exam Files</h3>
+                        <div id="new-exam-files-list" class="d-grid gap-2">
+                            <div class="border rounded p-3">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">File title</label>
+                                        <input class="form-control" type="text" name="new_exam_files_title[]" placeholder="Exam Paper 1">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">File</label>
+                                        <input class="form-control" type="file" name="new_exam_files_file[]">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm mt-2" type="button" id="add-exam-file">Add another file</button>
+                        <div class="form-text">Students will see the title instead of the filename.</div>
+                    </div>
                 </div>
 
                 <div class="d-flex gap-2 mt-4">
@@ -562,6 +630,8 @@ require __DIR__ . '/../header.php';
     const confirmDeleteDocs = document.getElementById('confirmDeleteDocs');
     const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
     const deleteDocs = new Set();
+    const newExamFileList = document.getElementById('new-exam-files-list');
+    const addExamFileButton = document.getElementById('add-exam-file');
 
     let newDocIndex = 1;
 
@@ -594,6 +664,26 @@ require __DIR__ . '/../header.php';
         documentList.appendChild(wrapper);
         newDocIndex += 1;
     });
+
+    if (addExamFileButton && newExamFileList) {
+        addExamFileButton.addEventListener('click', () => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'border rounded p-3';
+            wrapper.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label">File title</label>
+                        <input class="form-control" type="text" name="new_exam_files_title[]" placeholder="Exam Paper 1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">File</label>
+                        <input class="form-control" type="file" name="new_exam_files_file[]">
+                    </div>
+                </div>
+            `;
+            newExamFileList.appendChild(wrapper);
+        });
+    }
 
     document.querySelectorAll('.delete-doc-btn').forEach((button) => {
         button.addEventListener('click', () => {

@@ -5,6 +5,20 @@ declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/helpers.php';
 
+function build_exam_file_download_name(string $title, string $original): string
+{
+    $title = trim($title);
+    if ($title === '') {
+        return basename($original);
+    }
+    $ext = pathinfo($original, PATHINFO_EXTENSION);
+    $safeTitle = sanitize_name_component($title);
+    if ($safeTitle === '') {
+        return basename($original);
+    }
+    return $ext !== '' ? $safeTitle . '.' . $ext : $safeTitle;
+}
+
 $fileId = (int) ($_GET['id'] ?? 0);
 if ($fileId <= 0) {
     http_response_code(400);
@@ -46,9 +60,9 @@ if (!$realPath || !$uploadsRoot || strpos($realPath, $uploadsRoot) !== 0 || !is_
     exit;
 }
 
-$originalName = (string) $file['original_name'];
+$downloadName = build_exam_file_download_name((string) ($file['title'] ?? ''), (string) $file['original_name']);
 header('Content-Type: application/octet-stream');
-header('Content-Disposition: attachment; filename="' . basename($originalName) . '"');
+header('Content-Disposition: attachment; filename="' . basename($downloadName) . '"');
 header('Content-Length: ' . (string) filesize($realPath));
 readfile($realPath);
 exit;

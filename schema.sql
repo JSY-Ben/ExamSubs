@@ -33,6 +33,7 @@ CREATE TABLE exam_documents (
 CREATE TABLE exam_files (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exam_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
     original_name VARCHAR(255) NOT NULL,
     stored_name VARCHAR(255) NOT NULL,
     stored_path VARCHAR(500) NOT NULL,

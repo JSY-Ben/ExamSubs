@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $documentsNote = $_POST['documents_note'] ?? [];
     $documentsRequire = $_POST['documents_require'] ?? [];
     $documentsTypes = $_POST['documents_types'] ?? [];
+    $examFilesTitle = $_POST['exam_files_title'] ?? [];
     $fileNameTemplate = trim((string) ($_POST['file_name_template'] ?? ''));
     $folderNameTemplate = trim((string) ($_POST['folder_name_template'] ?? ''));
     $examPassword = trim((string) ($_POST['exam_password'] ?? ''));
@@ -66,6 +67,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $examFilesToStore = [];
+    if (!empty($_FILES['exam_files_file']) && is_array($_FILES['exam_files_file']['name'])) {
+        foreach ($_FILES['exam_files_file']['name'] as $index => $name) {
+            $title = trim((string) ($examFilesTitle[$index] ?? ''));
+            $error = (int) ($_FILES['exam_files_file']['error'][$index] ?? UPLOAD_ERR_NO_FILE);
+            if ($error === UPLOAD_ERR_NO_FILE) {
+                if ($title !== '') {
+                    $errors[] = 'Exam file title requires a file upload.';
+                    break;
+                }
+                continue;
+            }
+            if ($error !== UPLOAD_ERR_OK) {
+                $errors[] = 'Problem uploading exam files.';
+                break;
+            }
+            if ($title === '') {
+                $errors[] = 'Exam file title is required when uploading a file.';
+                break;
+            }
+            $examFilesToStore[] = [
+                'title' => $title,
+                'original_name' => (string) $name,
+                'tmp_name' => (string) ($_FILES['exam_files_file']['tmp_name'][$index] ?? ''),
+                'size' => (int) ($_FILES['exam_files_file']['size'][$index] ?? 0),
+            ];
+        }
+    }
+
     if (count($errors) === 0) {
         $pdo = db();
         $pdo->beginTransaction();
@@ -105,28 +135,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             }
 
-            if (!empty($_FILES['exam_files']) && is_array($_FILES['exam_files']['name'])) {
+            if (count($examFilesToStore) > 0) {
                 $examFilesDir = $uploadsDir . '/exam_' . $examId . '/exam_files';
                 if (!is_dir($examFilesDir) && !mkdir($examFilesDir, 0755, true)) {
                     throw new RuntimeException('Unable to create exam files directory.');
                 }
                 $insertFile = $pdo->prepare(
-                    'INSERT INTO exam_files (exam_id, original_name, stored_name, stored_path, file_size, uploaded_at)
-                     VALUES (?, ?, ?, ?, ?, ?)'
+                    'INSERT INTO exam_files (exam_id, title, original_name, stored_name, stored_path, file_size, uploaded_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?)'
                 );
-                foreach ($_FILES['exam_files']['name'] as $index => $name) {
-                    if (!isset($_FILES['exam_files']['error'][$index])) {
-                        continue;
-                    }
-                    $error = (int) $_FILES['exam_files']['error'][$index];
-                    if ($error === UPLOAD_ERR_NO_FILE) {
-                        continue;
-                    }
-                    if ($error !== UPLOAD_ERR_OK) {
-                        throw new RuntimeException('Problem uploading exam files.');
-                    }
-                    $tmpName = (string) ($_FILES['exam_files']['tmp_name'][$index] ?? '');
-                    $originalName = (string) $name;
+                foreach ($examFilesToStore as $file) {
+                    $tmpName = $file['tmp_name'];
+                    $originalName = $file['original_name'];
                     $storedName = uniqid('exam_file_', true) . '_' . sanitize_name_component($originalName);
                     $storedPath = $examFilesDir . '/' . $storedName;
                     if (!move_uploaded_file($tmpName, $storedPath)) {
@@ -135,10 +155,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $relativePath = str_replace($uploadsDir . '/', '', $storedPath);
                     $insertFile->execute([
                         $examId,
+                        $file['title'],
                         $originalName,
                         $storedName,
                         $relativePath,
-                        (int) ($_FILES['exam_files']['size'][$index] ?? 0),
+                        $file['size'],
                         now_utc_string(),
                     ]);
                 }
@@ -307,9 +328,23 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-3">
-                    <label class="form-label">Exam Files (optional)</label>
-                    <input class="form-control" type="file" name="exam_files[]" multiple>
-                    <div class="form-text">Upload any exam files students should download.</div>
+                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Files (optional)</h2>
+                    <div id="exam-files-list" class="d-grid gap-2">
+                        <div class="border rounded p-3">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">File title</label>
+                                    <input class="form-control" type="text" name="exam_files_title[]" placeholder="Exam Paper 1">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">File</label>
+                                    <input class="form-control" type="file" name="exam_files_file[]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm mt-2" type="button" id="add-exam-file">Add another file</button>
+                    <div class="form-text">Students will see the title instead of the filename.</div>
                 </div>
 
                 <button class="btn btn-primary mt-3" type="submit">Create Exam</button>
@@ -330,6 +365,8 @@ require __DIR__ . '/../header.php';
     const endAmpm = document.getElementById('end-ampm');
     const startHidden = document.getElementById('start-time-hidden');
     const endHidden = document.getElementById('end-time-hidden');
+    const examFileList = document.getElementById('exam-files-list');
+    const addExamFileButton = document.getElementById('add-exam-file');
 
     let docIndex = 1;
 
@@ -362,6 +399,26 @@ require __DIR__ . '/../header.php';
         documentList.appendChild(wrapper);
         docIndex += 1;
     });
+
+    if (addExamFileButton && examFileList) {
+        addExamFileButton.addEventListener('click', () => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'border rounded p-3';
+            wrapper.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label">File title</label>
+                        <input class="form-control" type="text" name="exam_files_title[]" placeholder="Exam Paper 1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">File</label>
+                        <input class="form-control" type="file" name="exam_files_file[]">
+                    </div>
+                </div>
+            `;
+            examFileList.appendChild(wrapper);
+        });
+    }
 
     const to24Hour = (value, period) => {
         const parts = value.split(':');

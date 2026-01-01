@@ -306,7 +306,7 @@ require __DIR__ . '/header.php';
                 <ul class="list-unstyled mt-3 mb-0">
                     <?php foreach ($examFiles as $file): ?>
                         <li class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 py-2 border-bottom">
-                            <span><?php echo e($file['original_name']); ?></span>
+                            <span><?php echo e($file['title'] !== '' ? $file['title'] : $file['original_name']); ?></span>
                             <a class="btn btn-outline-secondary btn-sm" href="download_exam_file.php?id=<?php echo (int) $file['id']; ?>">Download</a>
                         </li>
                     <?php endforeach; ?>

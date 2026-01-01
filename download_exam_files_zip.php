@@ -5,6 +5,20 @@ declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/helpers.php';
 
+function build_exam_file_download_name(string $title, string $original): string
+{
+    $title = trim($title);
+    if ($title === '') {
+        return basename($original);
+    }
+    $ext = pathinfo($original, PATHINFO_EXTENSION);
+    $safeTitle = sanitize_name_component($title);
+    if ($safeTitle === '') {
+        return basename($original);
+    }
+    return $ext !== '' ? $safeTitle . '.' . $ext : $safeTitle;
+}
+
 $examId = (int) ($_GET['exam_id'] ?? 0);
 if ($examId <= 0) {
     http_response_code(400);
@@ -65,13 +79,24 @@ if ($zip->open($tmpZip, ZipArchive::OVERWRITE) !== true) {
     exit;
 }
 
+$usedNames = [];
 foreach ($files as $file) {
     $storedPath = $uploadsDir . '/' . ltrim((string) $file['stored_path'], '/');
     $realPath = realpath($storedPath);
     if (!$realPath || strpos($realPath, $uploadsRoot) !== 0 || !is_file($realPath)) {
         continue;
     }
-    $zip->addFile($realPath, basename((string) $file['original_name']));
+    $entryName = build_exam_file_download_name((string) ($file['title'] ?? ''), (string) $file['original_name']);
+    if ($entryName === '') {
+        $entryName = 'file_' . (int) $file['id'];
+    }
+    if (isset($usedNames[$entryName])) {
+        $base = pathinfo($entryName, PATHINFO_FILENAME);
+        $ext = pathinfo($entryName, PATHINFO_EXTENSION);
+        $entryName = $base . '_' . (int) $file['id'] . ($ext !== '' ? '.' . $ext : '');
+    }
+    $usedNames[$entryName] = true;
+    $zip->addFile($realPath, $entryName);
 }
 
 $zip->close();
