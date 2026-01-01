@@ -9,6 +9,12 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+foreach (array_keys($_SESSION) as $key) {
+    if (strpos($key, 'exam_access_') === 0 || strpos($key, 'exam_roster_student_') === 0) {
+        unset($_SESSION[$key]);
+    }
+}
+
 $now = new DateTimeImmutable('now');
 
 $stmt = db()->query('SELECT * FROM exams WHERE is_completed = 0 ORDER BY start_time ASC');
@@ -74,24 +80,17 @@ require __DIR__ . '/header.php';
                                 $examFiles = $examFilesByExam[$examId] ?? [];
                                 $needsExamPassword = !empty($exam['access_password_hash']);
                                 $needsRosterPassword = !empty($exam['student_roster_enabled']) && ($exam['student_roster_mode'] ?? '') === 'password';
-                                $hasExamAccess = !empty($_SESSION['exam_access_' . $examId]);
-                                $hasRosterAccess = !empty($_SESSION['exam_roster_student_' . $examId]);
-                                $promptNeeded = ($needsExamPassword && !$hasExamAccess) || ($needsRosterPassword && !$hasRosterAccess);
+                                $promptNeeded = $needsExamPassword || $needsRosterPassword;
                                 $errorMessage = is_array($preauthErrors) ? ($preauthErrors[$examId] ?? '') : '';
                                 ?>
-                                <a class="btn btn-primary" href="student_exam.php?id=<?php echo (int) $exam['id']; ?>">
+                                <a class="btn btn-primary<?php echo $promptNeeded ? ' preauth-submit' : ''; ?>" href="student_exam.php?id=<?php echo $examId; ?>"
+                                    data-exam-id="<?php echo $examId; ?>"
+                                    data-exam-title="<?php echo e((string) $exam['title']); ?>"
+                                    data-needs-exam-password="<?php echo $needsExamPassword ? '1' : '0'; ?>"
+                                    data-needs-roster-password="<?php echo $needsRosterPassword ? '1' : '0'; ?>"
+                                    data-error-message="<?php echo e((string) $errorMessage); ?>">
                                     Submit Files
                                 </a>
-                                <?php if ($promptNeeded): ?>
-                                    <button class="btn btn-primary d-none preauth-trigger"
-                                        data-exam-id="<?php echo $examId; ?>"
-                                        data-exam-title="<?php echo e((string) $exam['title']); ?>"
-                                        data-needs-exam-password="<?php echo $needsExamPassword ? '1' : '0'; ?>"
-                                        data-needs-roster-password="<?php echo $needsRosterPassword ? '1' : '0'; ?>"
-                                        data-error-message="<?php echo e((string) $errorMessage); ?>">
-                                        Submit Files
-                                    </button>
-                                <?php endif; ?>
                                 <?php if (count($examFiles) > 0): ?>
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -99,12 +98,24 @@ require __DIR__ . '/header.php';
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a class="dropdown-item" href="download_exam_files_zip.php?exam_id=<?php echo $examId; ?>">Download all (ZIP)</a>
+                                                <a class="dropdown-item<?php echo $promptNeeded ? ' preauth-download' : ''; ?>" href="download_exam_files_zip.php?exam_id=<?php echo $examId; ?>"
+                                                    data-exam-id="<?php echo $examId; ?>"
+                                                    data-exam-title="<?php echo e((string) $exam['title']); ?>"
+                                                    data-needs-exam-password="<?php echo $needsExamPassword ? '1' : '0'; ?>"
+                                                    data-needs-roster-password="<?php echo $needsRosterPassword ? '1' : '0'; ?>"
+                                                    data-error-message="<?php echo e((string) $errorMessage); ?>">
+                                                    Download all (ZIP)
+                                                </a>
                                             </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <?php foreach ($examFiles as $file): ?>
                                                 <li>
-                                                    <a class="dropdown-item" href="download_exam_file.php?id=<?php echo (int) $file['id']; ?>">
+                                                    <a class="dropdown-item<?php echo $promptNeeded ? ' preauth-download' : ''; ?>" href="download_exam_file.php?id=<?php echo (int) $file['id']; ?>"
+                                                        data-exam-id="<?php echo $examId; ?>"
+                                                        data-exam-title="<?php echo e((string) $exam['title']); ?>"
+                                                        data-needs-exam-password="<?php echo $needsExamPassword ? '1' : '0'; ?>"
+                                                        data-needs-roster-password="<?php echo $needsRosterPassword ? '1' : '0'; ?>"
+                                                        data-error-message="<?php echo e((string) $errorMessage); ?>">
                                                         <?php echo e($file['title'] !== '' ? $file['title'] : $file['original_name']); ?>
                                                     </a>
                                                 </li>
@@ -133,6 +144,7 @@ require __DIR__ . '/header.php';
                     <p class="text-muted mb-3" id="examPasswordSubtitle"></p>
                     <div class="alert alert-danger d-none" id="examPasswordError"></div>
                     <input type="hidden" name="exam_id" id="examPasswordExamId" value="">
+                    <input type="hidden" name="return_to" id="examPasswordReturnTo" value="">
 
                     <div class="mb-3 d-none" id="examPasswordExamField">
                         <label class="form-label">Exam access password</label>
@@ -159,12 +171,13 @@ require __DIR__ . '/header.php';
     const modalSubtitle = document.getElementById('examPasswordSubtitle');
     const modalError = document.getElementById('examPasswordError');
     const modalExamId = document.getElementById('examPasswordExamId');
+    const modalReturnTo = document.getElementById('examPasswordReturnTo');
     const examField = document.getElementById('examPasswordExamField');
     const rosterField = document.getElementById('examPasswordRosterField');
     const examPasswordInput = examField?.querySelector('input');
     const rosterPasswordInput = rosterField?.querySelector('input');
 
-    const openPreauthModal = (button) => {
+    const openPreauthModal = (button, returnTo) => {
         const examId = button.dataset.examId;
         const examTitle = button.dataset.examTitle || 'Exam';
         const needsExamPassword = button.dataset.needsExamPassword === '1';
@@ -174,6 +187,7 @@ require __DIR__ . '/header.php';
         modalTitle.textContent = 'Enter access details';
         modalSubtitle.textContent = `Submit files for ${examTitle}`;
         modalExamId.value = examId || '';
+        modalReturnTo.value = returnTo || '';
         examField.classList.toggle('d-none', !needsExamPassword);
         rosterField.classList.toggle('d-none', !needsRosterPassword);
 
@@ -195,20 +209,24 @@ require __DIR__ . '/header.php';
         preauthModal.show();
     };
 
-    document.querySelectorAll('.preauth-trigger').forEach((button) => {
-        const mainLink = button.previousElementSibling;
-        if (mainLink && mainLink.tagName === 'A') {
-            mainLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                openPreauthModal(button);
-            });
-        }
+    document.querySelectorAll('.preauth-submit').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            openPreauthModal(link, link.getAttribute('href'));
+        });
     });
 
-    document.querySelectorAll('.preauth-trigger').forEach((button) => {
-        const errorMessage = button.dataset.errorMessage || '';
+    document.querySelectorAll('.preauth-download').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            openPreauthModal(link, link.getAttribute('href'));
+        });
+    });
+
+    document.querySelectorAll('.preauth-submit').forEach((link) => {
+        const errorMessage = link.dataset.errorMessage || '';
         if (errorMessage) {
-            openPreauthModal(button);
+            openPreauthModal(link, link.getAttribute('href'));
         }
     });
 </script>

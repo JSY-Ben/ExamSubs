@@ -5,6 +5,10 @@ declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/helpers.php';
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 function build_exam_file_download_name(string $title, string $original): string
 {
     $title = trim($title);
@@ -40,6 +44,19 @@ $now = new DateTimeImmutable('now');
 if (!exam_is_active($exam, $now)) {
     http_response_code(403);
     echo 'Exam not accepting submissions.';
+    exit;
+}
+
+$needsExamPassword = !empty($exam['access_password_hash']);
+$needsRosterPassword = !empty($exam['student_roster_enabled']) && ($exam['student_roster_mode'] ?? '') === 'password';
+if ($needsExamPassword && empty($_SESSION['exam_access_' . $examId])) {
+    http_response_code(403);
+    echo 'Exam access password required.';
+    exit;
+}
+if ($needsRosterPassword && empty($_SESSION['exam_roster_student_' . $examId])) {
+    http_response_code(403);
+    echo 'Student password required.';
     exit;
 }
 

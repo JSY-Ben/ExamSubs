@@ -12,6 +12,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 $examId = (int) ($_POST['exam_id'] ?? 0);
 $examPassword = trim((string) ($_POST['exam_password'] ?? ''));
 $studentPassword = trim((string) ($_POST['student_password'] ?? ''));
+$returnTo = trim((string) ($_POST['return_to'] ?? ''));
 
 if ($examId <= 0) {
     http_response_code(400);
@@ -66,5 +67,9 @@ if ($needsRosterPassword) {
     $_SESSION['exam_roster_student_' . $examId] = (int) $student['id'];
 }
 
-header('Location: student_exam.php?id=' . $examId);
+if ($returnTo === '' || strpos($returnTo, '://') !== false || str_contains($returnTo, "\n") || str_contains($returnTo, "\r")) {
+    $returnTo = 'student_exam.php?id=' . $examId;
+}
+
+header('Location: ' . $returnTo);
 exit;
