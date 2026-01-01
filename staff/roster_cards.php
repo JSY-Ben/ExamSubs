@@ -35,79 +35,70 @@ if (count($students) === 0) {
 }
 
 $pageTitle = 'Student Cards - ' . $exam['title'];
+$brandHref = 'index.php';
+$brandText = 'Exams Administration Portal';
+$logoPath = '../logo.png';
+$cssPath = '../style.css';
+$navActions = '<button class="btn btn-outline-primary btn-sm no-print" type="button" onclick="window.print()">Print / Save as PDF</button>'
+    . '<a class="btn btn-outline-secondary btn-sm no-print" href="exam_students.php?id=' . (int) $exam['id'] . '">Back to roster</a>';
+$pageScripts = <<<HTML
+<style>
+@media print {
+    .no-print,
+    nav,
+    footer {
+        display: none !important;
+    }
+    body {
+        background: #fff;
+    }
+    .student-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+.student-card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6c757d;
+}
+.student-card .value {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+.student-card .password {
+    font-size: 1.35rem;
+    letter-spacing: 0.2em;
+    font-family: "Courier New", Courier, monospace;
+}
+</style>
+HTML;
+require __DIR__ . '/../header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php echo e($pageTitle); ?></title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background: #fff;
-            }
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-        }
-        .student-card {
-            border: 1px solid #e1e5ea;
-            border-radius: 12px;
-            padding: 16px;
-            background: #fff;
-            min-height: 160px;
-        }
-        .student-card h2 {
-            font-size: 1.05rem;
-            margin: 0 0 8px;
-        }
-        .student-card .label {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-bottom: 2px;
-        }
-        .student-card .value {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .student-card .password {
-            font-size: 1.25rem;
-            letter-spacing: 2px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-start gap-3 no-print">
-            <div>
-                <h1 class="h4 mb-1"><?php echo e($exam['title']); ?> - Student Cards</h1>
-                <p class="text-muted mb-0">Print or save as PDF to distribute individual student access cards.</p>
-            </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm" type="button" onclick="window.print()">Print / Save as PDF</button>
-                <a class="btn btn-outline-secondary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Back to roster</a>
-            </div>
-        </div>
-
-        <div class="card-grid mt-4">
-            <?php foreach ($students as $student): ?>
-                <div class="student-card">
-                    <div class="label">Student</div>
-                    <h2><?php echo e(trim($student['student_first_name'] . ' ' . $student['student_last_name'])); ?></h2>
-                    <div class="label">Candidate Number</div>
-                    <div class="value"><?php echo e($student['candidate_number']); ?></div>
-                    <div class="label mt-2">Submission Password</div>
-                    <div class="value password"><?php echo e((string) ($student['access_password'] ?? '')); ?></div>
-                </div>
-            <?php endforeach; ?>
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-start gap-3 no-print">
+        <div>
+            <h1 class="h4 mb-1"><?php echo e($exam['title']); ?> - Student Cards</h1>
+            <p class="text-muted mb-0">Print or save as PDF to distribute individual student access cards.</p>
         </div>
     </div>
-</body>
-</html>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-2">
+        <?php foreach ($students as $student): ?>
+            <div class="col">
+                <div class="card shadow-sm h-100 student-card">
+                    <div class="card-body">
+                        <div class="label mb-1">Student</div>
+                        <h2 class="h5 mb-3"><?php echo e(trim($student['student_first_name'] . ' ' . $student['student_last_name'])); ?></h2>
+                        <div class="label mb-1">Candidate Number</div>
+                        <div class="value mb-3"><?php echo e($student['candidate_number']); ?></div>
+                        <div class="label mb-1">Submission Password</div>
+                        <div class="value password"><?php echo e((string) ($student['access_password'] ?? '')); ?></div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</main>
+<?php require __DIR__ . '/../footer.php'; ?>
