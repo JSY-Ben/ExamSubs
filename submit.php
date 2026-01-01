@@ -60,9 +60,9 @@ if ($rosterEnabled) {
             echo 'Student password required.';
             exit;
         }
-        $studentFirstName = (string) $student['student_first_name'];
-        $studentLastName = (string) $student['student_last_name'];
-        $candidateNumber = (string) $student['candidate_number'];
+        $studentFirstName = trim((string) $student['student_first_name']);
+        $studentLastName = trim((string) $student['student_last_name']);
+        $candidateNumber = trim((string) $student['candidate_number']);
     } else {
         $studentId = (int) ($_POST['student_id'] ?? 0);
         if ($studentId <= 0) {
@@ -78,11 +78,15 @@ if ($rosterEnabled) {
             echo 'Invalid student selection.';
             exit;
         }
-        $studentFirstName = (string) $student['student_first_name'];
-        $studentLastName = (string) $student['student_last_name'];
-        $candidateNumber = (string) $student['candidate_number'];
+        $studentFirstName = trim((string) $student['student_first_name']);
+        $studentLastName = trim((string) $student['student_last_name']);
+        $candidateNumber = trim((string) $student['candidate_number']);
     }
 }
+
+$studentFirstName = trim($studentFirstName);
+$studentLastName = trim($studentLastName);
+$candidateNumber = trim($candidateNumber);
 
 if ($studentFirstName === '' || $studentLastName === '' || $candidateNumber === '') {
     http_response_code(422);
@@ -91,8 +95,14 @@ if ($studentFirstName === '' || $studentLastName === '' || $candidateNumber === 
 }
 
 if ($rosterEnabled) {
-    $stmt = db()->prepare('SELECT COUNT(*) FROM submissions WHERE exam_id = ? AND candidate_number = ?');
-    $stmt->execute([$examId, $candidateNumber]);
+    $stmt = db()->prepare(
+        'SELECT COUNT(*) FROM submissions
+         WHERE exam_id = ?
+           AND TRIM(candidate_number) = ?
+           AND TRIM(student_first_name) = ?
+           AND TRIM(student_last_name) = ?'
+    );
+    $stmt->execute([$examId, $candidateNumber, $studentFirstName, $studentLastName]);
     if ((int) $stmt->fetchColumn() > 0) {
         http_response_code(409);
         echo 'Submission already received for this student.';
