@@ -6,6 +6,9 @@ require __DIR__ . '/../auth/require_auth.php';
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../helpers.php';
 
+$config = require __DIR__ . '/../config.php';
+$uploadsDir = rtrim($config['uploads_dir'], '/');
+
 $examId = (int) ($_GET['id'] ?? 0);
 
 $stmt = db()->prepare('SELECT * FROM exams WHERE id = ?');
@@ -21,6 +24,10 @@ if (!$exam) {
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
 $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
+
+$stmt = db()->prepare('SELECT * FROM exam_files WHERE exam_id = ? ORDER BY uploaded_at DESC, id DESC');
+$stmt->execute([$examId]);
+$examFiles = $stmt->fetchAll();
 
 $stmt = db()->prepare('SELECT COUNT(*) FROM submissions WHERE exam_id = ?');
 $stmt->execute([$examId]);
@@ -50,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newDocsRequire = (array) ($_POST['new_documents_require'] ?? []);
     $newDocsTypes = (array) ($_POST['new_documents_types'] ?? []);
     $deleteDocs = (array) ($_POST['delete_documents'] ?? []);
+    $deleteExamFiles = (array) ($_POST['delete_exam_files'] ?? []);
     if (is_string($deleteDocs)) {
         $deleteDocs = array_filter(explode(',', $deleteDocs), static function (string $value): bool {
             return trim($value) !== '';
@@ -198,8 +206,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            $deleteExamFiles = array_map('intval', $deleteExamFiles);
+            $deletedFilePaths = [];
+            if (count($deleteExamFiles) > 0) {
+                $placeholders = implode(',', array_fill(0, count($deleteExamFiles), '?'));
+                $selectStmt = $pdo->prepare("SELECT stored_path FROM exam_files WHERE exam_id = ? AND id IN ($placeholders)");
+                $selectStmt->execute(array_merge([$examId], $deleteExamFiles));
+                $deletedFilePaths = $selectStmt->fetchAll(PDO::FETCH_COLUMN);
+
+                $deleteStmt = $pdo->prepare("DELETE FROM exam_files WHERE exam_id = ? AND id IN ($placeholders)");
+                $deleteStmt->execute(array_merge([$examId], $deleteExamFiles));
+            }
+
+            if (!empty($_FILES['exam_files']) && is_array($_FILES['exam_files']['name'])) {
+                $examFilesDir = $uploadsDir . '/exam_' . $examId . '/exam_files';
+                if (!is_dir($examFilesDir) && !mkdir($examFilesDir, 0755, true)) {
+                    throw new RuntimeException('Unable to create exam files directory.');
+                }
+                $insertFile = $pdo->prepare(
+                    'INSERT INTO exam_files (exam_id, original_name, stored_name, stored_path, file_size, uploaded_at)
+                     VALUES (?, ?, ?, ?, ?, ?)'
+                );
+                foreach ($_FILES['exam_files']['name'] as $index => $name) {
+                    if (!isset($_FILES['exam_files']['error'][$index])) {
+                        continue;
+                    }
+                    $error = (int) $_FILES['exam_files']['error'][$index];
+                    if ($error === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
+                    if ($error !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException('Problem uploading exam files.');
+                    }
+                    $tmpName = (string) ($_FILES['exam_files']['tmp_name'][$index] ?? '');
+                    $originalName = (string) $name;
+                    $storedName = uniqid('exam_file_', true) . '_' . sanitize_name_component($originalName);
+                    $storedPath = $examFilesDir . '/' . $storedName;
+                    if (!move_uploaded_file($tmpName, $storedPath)) {
+                        throw new RuntimeException('Failed to store exam file.');
+                    }
+                    $relativePath = str_replace($uploadsDir . '/', '', $storedPath);
+                    $insertFile->execute([
+                        $examId,
+                        $originalName,
+                        $storedName,
+                        $relativePath,
+                        (int) ($_FILES['exam_files']['size'][$index] ?? 0),
+                        now_utc_string(),
+                    ]);
+                }
+            }
+
             $pdo->commit();
             $success = true;
+
+            if (count($deletedFilePaths) > 0) {
+                $uploadsRoot = realpath($uploadsDir);
+                foreach ($deletedFilePaths as $path) {
+                    $fullPath = $uploadsDir . '/' . ltrim((string) $path, '/');
+                    $realPath = realpath($fullPath);
+                    if ($realPath && $uploadsRoot && strpos($realPath, $uploadsRoot) === 0 && is_file($realPath)) {
+                        @unlink($realPath);
+                    }
+                }
+            }
 
             $stmt = $pdo->prepare('SELECT * FROM exams WHERE id = ?');
             $stmt->execute([$examId]);
@@ -208,6 +278,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
             $stmt->execute([$examId]);
             $documents = $stmt->fetchAll();
+
+            $stmt = $pdo->prepare('SELECT * FROM exam_files WHERE exam_id = ? ORDER BY uploaded_at DESC, id DESC');
+            $stmt->execute([$examId]);
+            $examFiles = $stmt->fetchAll();
         } catch (Throwable $e) {
             $pdo->rollBack();
             $errors[] = 'Failed to update exam.';
@@ -262,7 +336,7 @@ require __DIR__ . '/../header.php';
                 </div>
             <?php endif; ?>
 
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="delete_confirmed" id="delete-confirmed" value="0">
                 <input type="hidden" name="delete_documents" id="delete-documents" value="">
                 <div class="mb-3">
@@ -415,6 +489,38 @@ require __DIR__ . '/../header.php';
                         <input class="form-check-input" type="checkbox" name="clear_exam_password" value="1" id="clear-exam-password">
                         <label class="form-check-label" for="clear-exam-password">Clear existing password</label>
                     </div>
+                </div>
+
+                <div class="mt-4">
+                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Files</h2>
+                    <?php if (count($examFiles) === 0): ?>
+                        <p class="text-muted mb-2">No exam files uploaded.</p>
+                    <?php else: ?>
+                        <div class="table-responsive mb-2">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>Size</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($examFiles as $file): ?>
+                                        <tr>
+                                            <td><?php echo e($file['original_name']); ?></td>
+                                            <td class="text-muted"><?php echo e(format_bytes((int) $file['file_size'])); ?></td>
+                                            <td>
+                                                <input class="form-check-input" type="checkbox" name="delete_exam_files[]" value="<?php echo (int) $file['id']; ?>">
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                    <input class="form-control" type="file" name="exam_files[]" multiple>
+                    <div class="form-text">Upload additional files for students to download.</div>
                 </div>
 
                 <div class="d-flex gap-2 mt-4">

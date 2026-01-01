@@ -30,6 +30,20 @@ CREATE TABLE exam_documents (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE exam_files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_id INT NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    stored_name VARCHAR(255) NOT NULL,
+    stored_path VARCHAR(500) NOT NULL,
+    file_size INT NOT NULL,
+    uploaded_at DATETIME NOT NULL,
+    CONSTRAINT fk_exam_files_exam
+        FOREIGN KEY (exam_id)
+        REFERENCES exams (id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE submissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exam_id INT NOT NULL,

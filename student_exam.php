@@ -231,6 +231,10 @@ if ($rosterEnabled && $rosterMode === 'password' && $rosterStudent) {
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
 $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
+
+$stmt = db()->prepare('SELECT * FROM exam_files WHERE exam_id = ? ORDER BY uploaded_at DESC, id DESC');
+$stmt->execute([$examId]);
+$examFiles = $stmt->fetchAll();
 $prefillTokens = [];
 $prefillMeta = [];
 if ($replaceRequested) {
@@ -288,6 +292,28 @@ require __DIR__ . '/header.php';
         <h1 class="h3">Submit for <?php echo e($exam['title']); ?></h1>
         <p class="text-muted">Upload all required files before the submission window ends.</p>
     </div>
+
+    <?php if (count($examFiles) > 0): ?>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+                    <div>
+                        <h2 class="h6 text-uppercase fw-bold mb-1">Exam Files</h2>
+                        <p class="text-muted mb-0">Download the exam files provided by staff.</p>
+                    </div>
+                    <a class="btn btn-outline-primary btn-sm" href="download_exam_files_zip.php?exam_id=<?php echo (int) $exam['id']; ?>">Download all (ZIP)</a>
+                </div>
+                <ul class="list-unstyled mt-3 mb-0">
+                    <?php foreach ($examFiles as $file): ?>
+                        <li class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 py-2 border-bottom">
+                            <span><?php echo e($file['original_name']); ?></span>
+                            <a class="btn btn-outline-secondary btn-sm" href="download_exam_file.php?id=<?php echo (int) $file['id']; ?>">Download</a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <form class="card shadow-sm" action="submit.php" method="post" enctype="multipart/form-data">
         <div class="card-body">

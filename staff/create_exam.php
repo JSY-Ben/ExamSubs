@@ -6,6 +6,9 @@ require __DIR__ . '/../auth/require_auth.php';
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../helpers.php';
 
+$config = require __DIR__ . '/../config.php';
+$uploadsDir = rtrim($config['uploads_dir'], '/');
+
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -102,6 +105,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             }
 
+            if (!empty($_FILES['exam_files']) && is_array($_FILES['exam_files']['name'])) {
+                $examFilesDir = $uploadsDir . '/exam_' . $examId . '/exam_files';
+                if (!is_dir($examFilesDir) && !mkdir($examFilesDir, 0755, true)) {
+                    throw new RuntimeException('Unable to create exam files directory.');
+                }
+                $insertFile = $pdo->prepare(
+                    'INSERT INTO exam_files (exam_id, original_name, stored_name, stored_path, file_size, uploaded_at)
+                     VALUES (?, ?, ?, ?, ?, ?)'
+                );
+                foreach ($_FILES['exam_files']['name'] as $index => $name) {
+                    if (!isset($_FILES['exam_files']['error'][$index])) {
+                        continue;
+                    }
+                    $error = (int) $_FILES['exam_files']['error'][$index];
+                    if ($error === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
+                    if ($error !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException('Problem uploading exam files.');
+                    }
+                    $tmpName = (string) ($_FILES['exam_files']['tmp_name'][$index] ?? '');
+                    $originalName = (string) $name;
+                    $storedName = uniqid('exam_file_', true) . '_' . sanitize_name_component($originalName);
+                    $storedPath = $examFilesDir . '/' . $storedName;
+                    if (!move_uploaded_file($tmpName, $storedPath)) {
+                        throw new RuntimeException('Failed to store exam file.');
+                    }
+                    $relativePath = str_replace($uploadsDir . '/', '', $storedPath);
+                    $insertFile->execute([
+                        $examId,
+                        $originalName,
+                        $storedName,
+                        $relativePath,
+                        (int) ($_FILES['exam_files']['size'][$index] ?? 0),
+                        now_utc_string(),
+                    ]);
+                }
+            }
+
             $pdo->commit();
             header('Location: index.php');
             exit;
@@ -134,7 +176,7 @@ require __DIR__ . '/../header.php';
                 </div>
             <?php endif; ?>
 
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Exam ID</label>
                     <input class="form-control" type="text" name="exam_code" placeholder="EXAM-2024-01" required>
@@ -262,6 +304,12 @@ require __DIR__ . '/../header.php';
                     <label class="form-label">Exam Access Password (optional)</label>
                     <input class="form-control" type="password" name="exam_password" autocomplete="new-password">
                     <div class="form-text">Leave blank to allow direct access without a password.</div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label">Exam Files (optional)</label>
+                    <input class="form-control" type="file" name="exam_files[]" multiple>
+                    <div class="form-text">Upload any exam files students should download.</div>
                 </div>
 
                 <button class="btn btn-primary mt-3" type="submit">Create Exam</button>
