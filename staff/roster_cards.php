@@ -65,15 +65,17 @@ $pageScripts = <<<HTML
         display: grid !important;
         grid-template-columns: 1fr;
         gap: 6mm;
-        margin: 0;
+        margin: 0 !important;
         align-items: start;
         break-after: avoid-page;
         page-break-after: avoid;
         padding-bottom: 0;
+        --bs-gutter-x: 0;
+        --bs-gutter-y: 0;
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
-        padding: 0;
-        margin: 0;
+        padding: 0 !important;
+        margin: 0 !important;
         width: auto;
         break-inside: avoid;
         page-break-inside: avoid;
@@ -82,8 +84,9 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: 62mm;
+        height: 60mm !important;
         box-sizing: border-box;
+        overflow: hidden;
     }
 
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col:last-child {
