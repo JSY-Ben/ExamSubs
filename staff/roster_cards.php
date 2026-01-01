@@ -63,8 +63,8 @@ $pageScripts = <<<HTML
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 {
         display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10mm;
+        grid-template-columns: 1fr;
+        gap: 8mm;
         margin: 0;
         align-items: start;
     }
@@ -79,7 +79,7 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: calc((297mm - 24mm - 10mm) / 2);
+        height: calc((297mm - 24mm - 24mm) / 4);
     }
 }
 .student-card .label {
