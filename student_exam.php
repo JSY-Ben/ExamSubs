@@ -102,7 +102,13 @@ $rosterEnabled = !empty($exam['student_roster_enabled']);
 $rosterMode = ($exam['student_roster_mode'] ?? '') === 'password' ? 'password' : 'menu';
 $students = [];
 if ($rosterEnabled) {
-    $stmt = db()->prepare('SELECT * FROM exam_students WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
+    if ($rosterMode === 'menu') {
+        $stmt = db()->prepare(
+            'SELECT * FROM exam_students WHERE exam_id = ? ORDER BY student_last_name ASC, student_first_name ASC, candidate_number ASC, id ASC'
+        );
+    } else {
+        $stmt = db()->prepare('SELECT * FROM exam_students WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
+    }
     $stmt->execute([$examId]);
     $students = $stmt->fetchAll();
 }
