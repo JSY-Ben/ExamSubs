@@ -90,6 +90,16 @@ if ($studentFirstName === '' || $studentLastName === '' || $candidateNumber === 
     exit;
 }
 
+if ($rosterEnabled) {
+    $stmt = db()->prepare('SELECT COUNT(*) FROM submissions WHERE exam_id = ? AND candidate_number = ?');
+    $stmt->execute([$examId, $candidateNumber]);
+    if ((int) $stmt->fetchColumn() > 0) {
+        http_response_code(409);
+        echo 'Submission already received for this student.';
+        exit;
+    }
+}
+
 $requiresPassword = !empty($exam['access_password_hash'] ?? '');
 if ($requiresPassword) {
     $accessKey = 'exam_access_' . $examId;
