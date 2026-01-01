@@ -117,6 +117,8 @@ if (count($existingSubmissions) > 0 && !$replaceConfirmed) {
             'examiner_note' => $examinerNote,
         ];
     }
+    $tokenKey = 'pending_upload_tokens_' . $examId;
+    $_SESSION[$tokenKey] = $tokens;
     header('Location: student_exam.php?id=' . $examId . '&replace=1');
     exit;
 }
@@ -253,6 +255,10 @@ try {
     $pendingKey = 'pending_submission_' . $examId;
     if (isset($_SESSION[$pendingKey])) {
         unset($_SESSION[$pendingKey]);
+    }
+    $pendingTokensKey = 'pending_upload_tokens_' . $examId;
+    if (isset($_SESSION[$pendingTokensKey])) {
+        unset($_SESSION[$pendingTokensKey]);
     }
 
     $submissionId = (int) $pdo->lastInsertId();

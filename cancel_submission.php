@@ -12,6 +12,14 @@ if ($examId > 0) {
     if (isset($_SESSION[$rosterKey])) {
         unset($_SESSION[$rosterKey]);
     }
+    $pendingKey = 'pending_submission_' . $examId;
+    if (isset($_SESSION[$pendingKey])) {
+        unset($_SESSION[$pendingKey]);
+    }
+    $pendingTokensKey = 'pending_upload_tokens_' . $examId;
+    if (isset($_SESSION[$pendingTokensKey])) {
+        unset($_SESSION[$pendingTokensKey]);
+    }
 }
 
 header('Location: index.php');

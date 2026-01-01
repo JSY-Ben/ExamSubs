@@ -140,10 +140,19 @@ if (!$rosterEnabled) {
     $rosterMode = '';
 }
 $prefill = null;
-if (!$rosterEnabled && $replaceRequested) {
+if ($replaceRequested) {
     $sessionKey = 'pending_submission_' . $examId;
-    if (isset($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
+    if (!$rosterEnabled && isset($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
         $prefill = $_SESSION[$sessionKey];
+    }
+} else {
+    $sessionKey = 'pending_submission_' . $examId;
+    if (isset($_SESSION[$sessionKey])) {
+        unset($_SESSION[$sessionKey]);
+    }
+    $pendingTokensKey = 'pending_upload_tokens_' . $examId;
+    if (isset($_SESSION[$pendingTokensKey])) {
+        unset($_SESSION[$pendingTokensKey]);
     }
 }
 if ($rosterEnabled && $rosterMode === 'password') {
@@ -231,6 +240,13 @@ if ($rosterEnabled && $rosterMode === 'password' && $rosterStudent) {
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
 $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
+$prefillTokens = [];
+if ($replaceRequested) {
+    $tokenKey = 'pending_upload_tokens_' . $examId;
+    if (isset($_SESSION[$tokenKey]) && is_array($_SESSION[$tokenKey])) {
+        $prefillTokens = $_SESSION[$tokenKey];
+    }
+}
 $pageTitle = 'Submit Files - ' . $exam['title'];
 $brandHref = 'index.php';
 $brandText = 'Exams Submission Portal';
@@ -314,14 +330,15 @@ require __DIR__ . '/header.php';
                                 $accept = build_accept_attribute($doc['allowed_file_types'] ?? '');
                             }
                             ?>
+                            <?php $prefillToken = (string) ($prefillTokens[$doc['id']] ?? ''); ?>
                             <input class="form-control file-input" type="file" data-doc-id="<?php echo (int) $doc['id']; ?>" name="file_<?php echo (int) $doc['id']; ?>" <?php echo $accept !== '' ? 'accept="' . e($accept) . '"' : ''; ?>>
-                            <input type="hidden" name="uploaded_token_<?php echo (int) $doc['id']; ?>" id="uploaded-token-<?php echo (int) $doc['id']; ?>" value="">
+                            <input type="hidden" name="uploaded_token_<?php echo (int) $doc['id']; ?>" id="uploaded-token-<?php echo (int) $doc['id']; ?>" value="<?php echo e($prefillToken); ?>">
                             <div class="progress mt-2 d-none" id="progress-<?php echo (int) $doc['id']; ?>">
                                 <div class="progress-bar" role="progressbar" style="width: 0%">0%</div>
                             </div>
-                            <div class="form-text text-success d-none" id="status-<?php echo (int) $doc['id']; ?>">Upload complete.</div>
+                            <div class="form-text text-success<?php echo $prefillToken !== '' ? '' : ' d-none'; ?>" id="status-<?php echo (int) $doc['id']; ?>">Upload complete.</div>
                             <div class="form-text text-danger d-none" id="error-<?php echo (int) $doc['id']; ?>"></div>
-                            <button class="btn btn-outline-danger btn-sm mt-2 d-none remove-upload" type="button" data-doc-id="<?php echo (int) $doc['id']; ?>">Remove uploaded file</button>
+                            <button class="btn btn-outline-danger btn-sm mt-2<?php echo $prefillToken !== '' ? '' : ' d-none'; ?> remove-upload" type="button" data-doc-id="<?php echo (int) $doc['id']; ?>">Remove uploaded file</button>
                             <?php
                             $noteText = !empty($doc['student_note']) ? $doc['student_note'] : '';
                             $typesText = (!empty($doc['require_file_type']) && !empty($doc['allowed_file_types']))
@@ -441,7 +458,12 @@ require __DIR__ . '/header.php';
             return;
         }
 
-        const missing = fileInputs.filter((input) => !input.files || input.files.length === 0);
+        const missing = fileInputs.filter((input) => {
+            const docId = input.dataset.docId;
+            const tokenInput = docId ? document.getElementById(`uploaded-token-${docId}`) : null;
+            const hasToken = tokenInput && tokenInput.value.trim() !== '';
+            return (!input.files || input.files.length === 0) && !hasToken;
+        });
 
         if (missing.length > 0) {
             event.preventDefault();
