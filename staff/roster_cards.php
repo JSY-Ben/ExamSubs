@@ -62,22 +62,24 @@ $pageScripts = <<<HTML
         padding: 0;
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 {
-        display: block !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10mm;
         margin: 0;
+        align-items: start;
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
         padding: 0;
         margin: 0;
-        width: 100%;
+        width: auto;
         break-inside: avoid;
         page-break-inside: avoid;
-        page-break-after: always;
     }
     .student-card {
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: calc(297mm - 24mm);
+        height: calc((297mm - 24mm - 10mm) / 2);
     }
 }
 .student-card .label {
