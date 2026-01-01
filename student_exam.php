@@ -318,7 +318,12 @@ require __DIR__ . '/header.php';
             </div>
             <input type="hidden" name="missing_confirmed" id="missing-confirmed" value="0">
 
-            <button class="btn btn-primary" type="submit">Submit Files</button>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary" type="submit">Submit Files</button>
+                <button class="btn btn-outline-secondary" type="submit" formnovalidate formaction="cancel_submission.php" formmethod="post">
+                    Cancel submission
+                </button>
+            </div>
         </div>
     </form>
     <?php $maxUpload = upload_max_file_size(); ?>
