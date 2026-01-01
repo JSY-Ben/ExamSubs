@@ -70,10 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $examFilesToStore = [];
     if (!empty($_FILES['exam_files_file']) && is_array($_FILES['exam_files_file']['name'])) {
         foreach ($_FILES['exam_files_file']['name'] as $index => $name) {
-            $title = trim((string) ($examFilesTitle[$index] ?? ''));
+            $fileTitle = trim((string) ($examFilesTitle[$index] ?? ''));
             $error = (int) ($_FILES['exam_files_file']['error'][$index] ?? UPLOAD_ERR_NO_FILE);
             if ($error === UPLOAD_ERR_NO_FILE) {
-                if ($title !== '') {
+                if ($fileTitle !== '') {
                     $errors[] = 'Exam file title requires a file upload.';
                     break;
                 }
@@ -83,12 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Problem uploading exam files.';
                 break;
             }
-            if ($title === '') {
+            if ($fileTitle === '') {
                 $errors[] = 'Exam file title is required when uploading a file.';
                 break;
             }
             $examFilesToStore[] = [
-                'title' => $title,
+                'title' => $fileTitle,
                 'original_name' => (string) $name,
                 'tmp_name' => (string) ($_FILES['exam_files_file']['tmp_name'][$index] ?? ''),
                 'size' => (int) ($_FILES['exam_files_file']['size'][$index] ?? 0),
