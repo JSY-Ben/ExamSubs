@@ -45,6 +45,22 @@ CREATE TABLE exam_files (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE exam_material_downloads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_id INT NOT NULL,
+    exam_student_id INT NOT NULL,
+    downloaded_at DATETIME NOT NULL,
+    CONSTRAINT fk_exam_material_downloads_exam
+        FOREIGN KEY (exam_id)
+        REFERENCES exams (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_exam_material_downloads_student
+        FOREIGN KEY (exam_student_id)
+        REFERENCES exam_students (id)
+        ON DELETE CASCADE,
+    UNIQUE KEY uniq_exam_material_download (exam_id, exam_student_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE submissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     exam_id INT NOT NULL,

@@ -60,6 +60,18 @@ if ($needsRosterPassword && empty($_SESSION['exam_roster_student_' . $examId])) 
     exit;
 }
 
+if ($needsRosterPassword) {
+    $studentId = (int) ($_SESSION['exam_roster_student_' . $examId] ?? 0);
+    if ($studentId > 0) {
+        $stmt = db()->prepare(
+            'INSERT INTO exam_material_downloads (exam_id, exam_student_id, downloaded_at)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE downloaded_at = VALUES(downloaded_at)'
+        );
+        $stmt->execute([$examId, $studentId, now_utc_string()]);
+    }
+}
+
 $stmt = db()->prepare('SELECT * FROM exam_files WHERE exam_id = ? ORDER BY id ASC');
 $stmt->execute([$examId]);
 $files = $stmt->fetchAll();

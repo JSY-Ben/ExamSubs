@@ -161,6 +161,14 @@ if ($rosterEnabled) {
     $stmt->execute([$examId]);
     $rosterStudents = $stmt->fetchAll();
 
+    $stmt = db()->prepare('SELECT exam_student_id, downloaded_at FROM exam_material_downloads WHERE exam_id = ?');
+    $stmt->execute([$examId]);
+    $downloadRows = $stmt->fetchAll();
+    $downloadedByStudent = [];
+    foreach ($downloadRows as $row) {
+        $downloadedByStudent[(int) $row['exam_student_id']] = (string) $row['downloaded_at'];
+    }
+
     $submissionByCandidate = [];
     foreach ($submissions as $submissionId => $submission) {
         $candidate = trim((string) ($submission['info']['candidate_number'] ?? ''));
@@ -169,12 +177,22 @@ if ($rosterEnabled) {
         }
     }
 
+    $studentIdByCandidate = [];
+    foreach ($rosterStudents as $student) {
+        $candidate = trim((string) ($student['candidate_number'] ?? ''));
+        if ($candidate !== '' && !isset($studentIdByCandidate[$candidate])) {
+            $studentIdByCandidate[$candidate] = (int) $student['id'];
+        }
+    }
+
     $orderedSubmissions = [];
     $matchedSubmissionIds = [];
     foreach ($rosterStudents as $student) {
         $candidate = trim((string) ($student['candidate_number'] ?? ''));
+        $materialsDownloadedAt = $downloadedByStudent[(int) $student['id']] ?? '';
         if ($candidate !== '' && isset($submissionByCandidate[$candidate])) {
             $submissionId = $submissionByCandidate[$candidate];
+            $submissions[$submissionId]['info']['materials_downloaded_at'] = $materialsDownloadedAt;
             $orderedSubmissions[] = $submissions[$submissionId];
             $matchedSubmissionIds[$submissionId] = true;
         } else {
@@ -187,6 +205,7 @@ if ($rosterEnabled) {
                     'candidate_number' => (string) $student['candidate_number'],
                     'examiner_note' => null,
                     'submitted_at' => '',
+                    'materials_downloaded_at' => $materialsDownloadedAt,
                 ],
                 'files' => [],
             ];
@@ -195,6 +214,11 @@ if ($rosterEnabled) {
 
     foreach ($submissions as $submissionId => $submission) {
         if (!isset($matchedSubmissionIds[$submissionId])) {
+            $candidate = trim((string) ($submission['info']['candidate_number'] ?? ''));
+            if ($candidate !== '' && isset($studentIdByCandidate[$candidate])) {
+                $studentId = $studentIdByCandidate[$candidate];
+                $submission['info']['materials_downloaded_at'] = $downloadedByStudent[$studentId] ?? '';
+            }
             $orderedSubmissions[] = $submission;
         }
     }
@@ -270,6 +294,11 @@ if ($rosterEnabled) {
                                     ?>
                                 </div>
                                 <small class="text-muted">Candidate: <?php echo e($submission['info']['candidate_number']); ?></small>
+                                <?php if (!empty($submission['info']['materials_downloaded_at'])): ?>
+                                    <div class="text-muted small mt-1">
+                                        <strong>Materials downloaded:</strong> <?php echo e(format_datetime_display($submission['info']['materials_downloaded_at'])); ?>
+                                    </div>
+                                <?php endif; ?>
                                 <?php if (!empty($submission['info']['examiner_note'])): ?>
                                     <div class="text-muted small mt-1">
                                         <strong>Note:</strong> <?php echo e($submission['info']['examiner_note']); ?>

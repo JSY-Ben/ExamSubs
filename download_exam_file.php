@@ -65,6 +65,18 @@ if ($needsRosterPassword && empty($_SESSION['exam_roster_student_' . (int) $file
     exit;
 }
 
+if ($needsRosterPassword) {
+    $studentId = (int) ($_SESSION['exam_roster_student_' . (int) $file['exam_id']] ?? 0);
+    if ($studentId > 0) {
+        $stmt = db()->prepare(
+            'INSERT INTO exam_material_downloads (exam_id, exam_student_id, downloaded_at)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE downloaded_at = VALUES(downloaded_at)'
+        );
+        $stmt->execute([(int) $file['exam_id'], $studentId, now_utc_string()]);
+    }
+}
+
 $config = require __DIR__ . '/config.php';
 $uploadsDir = rtrim($config['uploads_dir'], '/');
 $storedPath = $uploadsDir . '/' . ltrim((string) $file['stored_path'], '/');
