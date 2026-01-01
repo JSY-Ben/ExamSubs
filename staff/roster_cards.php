@@ -66,11 +66,14 @@ $pageScripts = <<<HTML
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10mm;
         margin: 0;
+        align-items: start;
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
         padding: 0;
         margin: 0;
         width: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
     .student-card {
         break-inside: avoid;
