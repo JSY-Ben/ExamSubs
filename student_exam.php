@@ -128,6 +128,69 @@ if ($rosterEnabled && count($students) === 0) {
     exit;
 }
 
+$rosterStudent = null;
+if ($rosterEnabled && $rosterMode === 'password') {
+    $rosterSessionKey = 'exam_roster_student_' . $examId;
+    $studentId = (int) ($_SESSION[$rosterSessionKey] ?? 0);
+    if ($studentId > 0) {
+        $stmt = db()->prepare('SELECT * FROM exam_students WHERE id = ? AND exam_id = ?');
+        $stmt->execute([$studentId, $examId]);
+        $rosterStudent = $stmt->fetch();
+    }
+
+    if (!$rosterStudent && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $studentPassword = trim((string) ($_POST['student_password'] ?? ''));
+        if ($studentPassword === '') {
+            $accessError = 'Student password required.';
+        } else {
+            $stmt = db()->prepare('SELECT * FROM exam_students WHERE exam_id = ? AND access_password = ? LIMIT 1');
+            $stmt->execute([$examId, $studentPassword]);
+            $rosterStudent = $stmt->fetch();
+            if ($rosterStudent) {
+                $_SESSION[$rosterSessionKey] = (int) $rosterStudent['id'];
+                header('Location: student_exam.php?id=' . $examId);
+                exit;
+            }
+            $accessError = 'Invalid student password.';
+        }
+    }
+
+    if (!$rosterStudent) {
+        $pageTitle = 'Enter Student Password';
+        $brandHref = 'index.php';
+        $brandText = 'Exams Submission Portal';
+        $logoPath = 'logo.png';
+        $cssPath = 'style.css';
+        $navActions = '';
+        require __DIR__ . '/header.php';
+        ?>
+        <main class="container py-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h5 mb-3">Student password required</h1>
+                    <p class="text-muted">Enter the student password to continue.</p>
+
+                    <?php if ($accessError !== ''): ?>
+                        <div class="alert alert-danger"><?php echo e($accessError); ?></div>
+                    <?php endif; ?>
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Student password</label>
+                            <input class="form-control" type="password" name="student_password" autocomplete="current-password" required>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Continue</button>
+                        <a class="btn btn-outline-secondary" href="index.php">Back</a>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <?php
+        require __DIR__ . '/footer.php';
+        exit;
+    }
+}
+
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE exam_id = ? ORDER BY sort_order ASC, id ASC');
 $stmt->execute([$examId]);
 $documents = $stmt->fetchAll();
@@ -151,10 +214,12 @@ require __DIR__ . '/header.php';
 
             <?php if ($rosterEnabled): ?>
                 <?php if ($rosterMode === 'password'): ?>
-                    <div class="mb-3">
-                        <label class="form-label">Student Password</label>
-                        <input class="form-control" type="password" name="student_password" autocomplete="current-password" required>
-                        <div class="form-text">Enter the password provided for your submission.</div>
+                    <div class="alert alert-info">
+                        <?php
+                        $label = trim(($rosterStudent['student_first_name'] ?? '') . ' ' . ($rosterStudent['student_last_name'] ?? ''));
+                        $candidate = (string) ($rosterStudent['candidate_number'] ?? '');
+                        ?>
+                        Submitting as <strong><?php echo e($label); ?></strong><?php echo $candidate !== '' ? ' (' . e($candidate) . ')' : ''; ?>.
                     </div>
                 <?php else: ?>
                     <div class="mb-3">

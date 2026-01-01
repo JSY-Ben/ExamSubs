@@ -45,6 +45,17 @@ if ($requiresPassword) {
     }
 }
 
+$rosterEnabled = !empty($exam['student_roster_enabled']);
+$rosterMode = ($exam['student_roster_mode'] ?? '') === 'password' ? 'password' : 'menu';
+if ($rosterEnabled && $rosterMode === 'password') {
+    $rosterSessionKey = 'exam_roster_student_' . $examId;
+    if (empty($_SESSION[$rosterSessionKey])) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Student password required.']);
+        exit;
+    }
+}
+
 $stmt = db()->prepare('SELECT * FROM exam_documents WHERE id = ? AND exam_id = ?');
 $stmt->execute([$docId, $examId]);
 $doc = $stmt->fetch();

@@ -45,18 +45,19 @@ $rosterEnabled = !empty($exam['student_roster_enabled']);
 $rosterMode = ($exam['student_roster_mode'] ?? '') === 'password' ? 'password' : 'menu';
 if ($rosterEnabled) {
     if ($rosterMode === 'password') {
-        $studentPassword = trim((string) ($_POST['student_password'] ?? ''));
-        if ($studentPassword === '') {
-            http_response_code(422);
+        $rosterSessionKey = 'exam_roster_student_' . $examId;
+        $studentId = (int) ($_SESSION[$rosterSessionKey] ?? 0);
+        if ($studentId <= 0) {
+            http_response_code(403);
             echo 'Student password required.';
             exit;
         }
-        $stmt = db()->prepare('SELECT * FROM exam_students WHERE exam_id = ? AND access_password = ? LIMIT 1');
-        $stmt->execute([$examId, $studentPassword]);
+        $stmt = db()->prepare('SELECT * FROM exam_students WHERE id = ? AND exam_id = ?');
+        $stmt->execute([$studentId, $examId]);
         $student = $stmt->fetch();
         if (!$student) {
-            http_response_code(422);
-            echo 'Invalid student password.';
+            http_response_code(403);
+            echo 'Student password required.';
             exit;
         }
         $studentFirstName = (string) $student['student_first_name'];
