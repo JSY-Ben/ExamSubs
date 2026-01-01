@@ -5,6 +5,16 @@ declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/helpers.php';
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+foreach (array_keys($_SESSION) as $key) {
+    if (strpos($key, 'exam_roster_student_') === 0) {
+        unset($_SESSION[$key]);
+    }
+}
+
 $now = new DateTimeImmutable('now');
 
 $stmt = db()->query('SELECT * FROM exams WHERE is_completed = 0 ORDER BY start_time ASC');
