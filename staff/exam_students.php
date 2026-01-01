@@ -59,7 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $normalized = [];
                     foreach ($header as $index => $name) {
-                        $key = strtolower(trim((string) $name));
+                        $name = (string) $name;
+                        if ($index === 0) {
+                            $name = preg_replace('/^\xEF\xBB\xBF/', '', $name);
+                        }
+                        $key = strtolower(trim($name));
                         $key = preg_replace('/\\s+/', '_', $key);
                         $key = preg_replace('/_+/', '_', $key);
                         $normalized[$key] = $index;
