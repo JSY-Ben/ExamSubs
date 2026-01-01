@@ -293,6 +293,13 @@ foreach ($documents as $doc) {
         continue;
     }
 
+    if ($error === UPLOAD_ERR_NO_FILE) {
+        if (isset($tokens[$doc['id']])) {
+            $uploadedCount++;
+        }
+        continue;
+    }
+
     if ($error !== UPLOAD_ERR_NO_FILE) {
         http_response_code(422);
         echo 'Problem uploading file: ' . e($doc['title']);
