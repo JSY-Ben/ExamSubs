@@ -20,6 +20,10 @@ if ($examId > 0) {
     if (isset($_SESSION[$pendingTokensKey])) {
         unset($_SESSION[$pendingTokensKey]);
     }
+    $pendingNamesKey = 'pending_upload_names_' . $examId;
+    if (isset($_SESSION[$pendingNamesKey])) {
+        unset($_SESSION[$pendingNamesKey]);
+    }
 }
 
 header('Location: index.php');

@@ -119,6 +119,29 @@ if (count($existingSubmissions) > 0 && !$replaceConfirmed) {
     }
     $tokenKey = 'pending_upload_tokens_' . $examId;
     $_SESSION[$tokenKey] = $tokens;
+    if (count($tokens) > 0) {
+        $nameKey = 'pending_upload_names_' . $examId;
+        $tmpDir = $uploadsDir . '/tmp';
+        $names = [];
+        foreach ($tokens as $docId => $token) {
+            $metaPath = $tmpDir . '/' . $token . '.json';
+            if (!is_file($metaPath)) {
+                continue;
+            }
+            $metaRaw = file_get_contents($metaPath);
+            $meta = $metaRaw !== false ? json_decode($metaRaw, true) : null;
+            if (!is_array($meta)) {
+                continue;
+            }
+            $originalName = (string) ($meta['original_name'] ?? '');
+            if ($originalName !== '') {
+                $names[(int) $docId] = $originalName;
+            }
+        }
+        if (count($names) > 0) {
+            $_SESSION[$nameKey] = $names;
+        }
+    }
     header('Location: student_exam.php?id=' . $examId . '&replace=1');
     exit;
 }
@@ -259,6 +282,10 @@ try {
     $pendingTokensKey = 'pending_upload_tokens_' . $examId;
     if (isset($_SESSION[$pendingTokensKey])) {
         unset($_SESSION[$pendingTokensKey]);
+    }
+    $pendingNamesKey = 'pending_upload_names_' . $examId;
+    if (isset($_SESSION[$pendingNamesKey])) {
+        unset($_SESSION[$pendingNamesKey]);
     }
 
     $submissionId = (int) $pdo->lastInsertId();

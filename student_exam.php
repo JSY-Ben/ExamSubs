@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 require __DIR__ . '/db.php';
 require __DIR__ . '/helpers.php';
-require __DIR__ . '/config.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -155,6 +154,10 @@ if ($replaceRequested) {
     if (isset($_SESSION[$pendingTokensKey])) {
         unset($_SESSION[$pendingTokensKey]);
     }
+    $pendingNamesKey = 'pending_upload_names_' . $examId;
+    if (isset($_SESSION[$pendingNamesKey])) {
+        unset($_SESSION[$pendingNamesKey]);
+    }
 }
 if ($rosterEnabled && $rosterMode === 'password') {
     $rosterSessionKey = 'exam_roster_student_' . $examId;
@@ -244,12 +247,22 @@ $documents = $stmt->fetchAll();
 $prefillTokens = [];
 $prefillMeta = [];
 if ($replaceRequested) {
+    $nameKey = 'pending_upload_names_' . $examId;
+    if (isset($_SESSION[$nameKey]) && is_array($_SESSION[$nameKey])) {
+        foreach ($_SESSION[$nameKey] as $docId => $name) {
+            $prefillMeta[(int) $docId] = [
+                'original_name' => (string) $name,
+            ];
+        }
+    }
+}
+if ($replaceRequested) {
     $tokenKey = 'pending_upload_tokens_' . $examId;
     if (isset($_SESSION[$tokenKey]) && is_array($_SESSION[$tokenKey])) {
         $prefillTokens = $_SESSION[$tokenKey];
     }
 }
-if ($replaceRequested && count($prefillTokens) > 0) {
+if ($replaceRequested && count($prefillTokens) > 0 && count($prefillMeta) === 0) {
     $config = require __DIR__ . '/config.php';
     $uploadsDir = rtrim($config['uploads_dir'], '/');
     $tmpDir = $uploadsDir . '/tmp';
@@ -272,7 +285,6 @@ if ($replaceRequested && count($prefillTokens) > 0) {
         }
         $prefillMeta[(int) $docId] = [
             'original_name' => (string) ($meta['original_name'] ?? ''),
-            'file_size' => (int) ($meta['file_size'] ?? 0),
         ];
     }
 }
@@ -369,8 +381,12 @@ require __DIR__ . '/header.php';
                                 <div class="progress-bar" role="progressbar" style="width: <?php echo $prefillToken !== '' ? '100%' : '0%'; ?>"><?php echo $prefillToken !== '' ? '100%' : '0%'; ?></div>
                             </div>
                             <div class="form-text text-success<?php echo $prefillToken !== '' ? '' : ' d-none'; ?>" id="status-<?php echo (int) $doc['id']; ?>">Upload complete.</div>
-                            <?php if ($prefillToken !== '' && is_array($prefillInfo) && $prefillInfo['original_name'] !== ''): ?>
-                                <div class="form-text text-muted">Cached file: <?php echo e($prefillInfo['original_name']); ?></div>
+                            <?php if ($prefillToken !== ''): ?>
+                                <?php if (is_array($prefillInfo) && $prefillInfo['original_name'] !== ''): ?>
+                                    <div class="form-text text-muted">Cached file: <?php echo e($prefillInfo['original_name']); ?></div>
+                                <?php else: ?>
+                                    <div class="form-text text-muted">Cached file ready for resubmission.</div>
+                                <?php endif; ?>
                             <?php endif; ?>
                             <div class="form-text text-danger d-none" id="error-<?php echo (int) $doc['id']; ?>"></div>
                             <button class="btn btn-outline-danger btn-sm mt-2<?php echo $prefillToken !== '' ? '' : ' d-none'; ?> remove-upload" type="button" data-doc-id="<?php echo (int) $doc['id']; ?>">Remove uploaded file</button>
