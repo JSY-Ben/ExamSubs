@@ -72,11 +72,13 @@ $pageScripts = <<<HTML
         padding-bottom: 0;
         --bs-gutter-x: 0;
         --bs-gutter-y: 0;
+        --card-height: calc((297mm - 28mm - 8mm) / 3);
     }
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col {
         padding: 0 !important;
         margin: 0 !important;
         width: auto;
+        height: var(--card-height);
         break-inside: avoid;
         page-break-inside: avoid;
     }
@@ -88,11 +90,12 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: auto;
+        height: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     .student-card .card-body {
-        padding: 8mm 10mm;
+        padding: 6mm 8mm;
     }
     .student-card h2 {
         margin-bottom: 6mm;
