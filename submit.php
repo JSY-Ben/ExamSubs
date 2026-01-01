@@ -108,6 +108,15 @@ $stmt->execute([$examId, $candidateNumber, $studentFirstName, $studentLastName])
 $existingSubmissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 if (count($existingSubmissions) > 0 && !$replaceConfirmed) {
+    if (!$rosterEnabled) {
+        $sessionKey = 'pending_submission_' . $examId;
+        $_SESSION[$sessionKey] = [
+            'student_first_name' => $studentFirstName,
+            'student_last_name' => $studentLastName,
+            'candidate_number' => $candidateNumber,
+            'examiner_note' => $examinerNote,
+        ];
+    }
     header('Location: student_exam.php?id=' . $examId . '&replace=1');
     exit;
 }

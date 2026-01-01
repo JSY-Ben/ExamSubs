@@ -139,6 +139,13 @@ $rosterStudent = null;
 if (!$rosterEnabled) {
     $rosterMode = '';
 }
+$prefill = null;
+if (!$rosterEnabled) {
+    $sessionKey = 'pending_submission_' . $examId;
+    if (isset($_SESSION[$sessionKey]) && is_array($_SESSION[$sessionKey])) {
+        $prefill = $_SESSION[$sessionKey];
+    }
+}
 if ($rosterEnabled && $rosterMode === 'password') {
     $rosterSessionKey = 'exam_roster_student_' . $examId;
     $studentId = (int) ($_SESSION[$rosterSessionKey] ?? 0);
@@ -276,21 +283,21 @@ require __DIR__ . '/header.php';
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label">First Name</label>
-                        <input class="form-control" type="text" name="student_first_name" required>
+                        <input class="form-control" type="text" name="student_first_name" value="<?php echo e((string) ($prefill['student_first_name'] ?? '')); ?>" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Surname</label>
-                        <input class="form-control" type="text" name="student_last_name" required>
+                        <input class="form-control" type="text" name="student_last_name" value="<?php echo e((string) ($prefill['student_last_name'] ?? '')); ?>" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Candidate Number</label>
-                        <input class="form-control" type="text" name="candidate_number" required>
+                        <input class="form-control" type="text" name="candidate_number" value="<?php echo e((string) ($prefill['candidate_number'] ?? '')); ?>" required>
                     </div>
                 </div>
             <?php endif; ?>
             <div class="mb-3">
                 <label class="form-label">Note to Examiner</label>
-                <textarea class="form-control" name="examiner_note" rows="3" placeholder="Please put anything you wish the examiner to know about this submission here"></textarea>
+                <textarea class="form-control" name="examiner_note" rows="3" placeholder="Please put anything you wish the examiner to know about this submission here"><?php echo e((string) ($prefill['examiner_note'] ?? '')); ?></textarea>
             </div>
 
             <div class="mb-3">
