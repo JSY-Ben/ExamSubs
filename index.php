@@ -31,7 +31,10 @@ if (count($exams) > 0) {
         return (int) $exam['id'];
     }, $exams);
     $placeholders = implode(',', array_fill(0, count($examIds), '?'));
-    $stmt = db()->prepare("SELECT * FROM exam_files WHERE exam_id IN ($placeholders) ORDER BY uploaded_at DESC, id DESC");
+    $stmt = db()->prepare(
+        "SELECT * FROM exam_files WHERE exam_id IN ($placeholders)
+         ORDER BY exam_id ASC, title ASC, original_name ASC, id ASC"
+    );
     $stmt->execute($examIds);
     foreach ($stmt->fetchAll() as $file) {
         $examId = (int) $file['exam_id'];
