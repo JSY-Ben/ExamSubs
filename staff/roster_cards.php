@@ -84,7 +84,7 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: 62mm;
+        height: calc((297mm - 28mm - 12mm) / 3);
         box-sizing: border-box;
     }
 
