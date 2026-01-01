@@ -64,7 +64,7 @@ $pageScripts = <<<HTML
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 {
         display: grid !important;
         grid-template-columns: 1fr;
-        gap: 6mm;
+        gap: 4mm;
         margin: 0 !important;
         align-items: start;
         break-after: avoid-page;
@@ -80,12 +80,29 @@ $pageScripts = <<<HTML
         break-inside: avoid;
         page-break-inside: avoid;
     }
+    .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col:nth-child(3n) {
+        break-after: page;
+        page-break-after: always;
+    }
     .student-card {
         break-inside: avoid;
         page-break-inside: avoid;
         min-height: 0;
-        height: calc((297mm - 28mm - 12mm) / 3);
+        height: auto;
         box-sizing: border-box;
+    }
+    .student-card .card-body {
+        padding: 8mm 10mm;
+    }
+    .student-card h2 {
+        margin-bottom: 6mm;
+    }
+    .student-card .value {
+        font-size: 1rem;
+    }
+    .student-card .password {
+        font-size: 1.15rem;
+        letter-spacing: 0.16em;
     }
 
     .row.row-cols-1.row-cols-md-2.row-cols-lg-3 > .col:last-child {
