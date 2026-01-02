@@ -503,16 +503,16 @@ require __DIR__ . '/../header.php';
                     <input class="form-control" type="text" name="file_name_template" id="edit-file-template" value="<?php echo e((string) ($exam['file_name_template'] ?? '')); ?>" placeholder="{candidate_number}_{document_title}_{original_name}">
                     <div class="form-text">Example: {candidate_number}_{document_title}_{original_name}</div>
                     <div class="form-text d-flex flex-wrap gap-2">
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{exam_id}">{exam_id}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{exam_title}">{exam_title}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_firstname}">{student_firstname}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_surname}">{student_surname}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_firstname_initial}">{student_firstname_initial}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_surname_initial}">{student_surname_initial}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{candidate_number}">{candidate_number}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{document_title}">{document_title}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{original_name}">{original_name}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{submission_id}">{submission_id}</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{exam_id}" data-bs-toggle="tooltip" data-bs-title="{exam_id}">Exam ID</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{exam_title}" data-bs-toggle="tooltip" data-bs-title="{exam_title}">Exam Title</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_firstname}" data-bs-toggle="tooltip" data-bs-title="{student_firstname}">Student First Name</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_surname}" data-bs-toggle="tooltip" data-bs-title="{student_surname}">Student Surname</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_firstname_initial}" data-bs-toggle="tooltip" data-bs-title="{student_firstname_initial}">Student First Initial</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{student_surname_initial}" data-bs-toggle="tooltip" data-bs-title="{student_surname_initial}">Student Surname Initial</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{candidate_number}" data-bs-toggle="tooltip" data-bs-title="{candidate_number}">Candidate Number</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{document_title}" data-bs-toggle="tooltip" data-bs-title="{document_title}">Document Title</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{original_name}" data-bs-toggle="tooltip" data-bs-title="{original_name}">Original Uploaded Filename</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-file-template" data-token="{submission_id}" data-bs-toggle="tooltip" data-bs-title="{submission_id}">Submission ID</button>
                     </div>
                 </div>
 
@@ -521,14 +521,14 @@ require __DIR__ . '/../header.php';
                     <input class="form-control" type="text" name="folder_name_template" id="edit-folder-template" value="<?php echo e((string) ($exam['folder_name_template'] ?? '')); ?>" placeholder="{candidate_number}_{student_surname}">
                     <div class="form-text">Example: {candidate_number}_{student_surname}</div>
                     <div class="form-text d-flex flex-wrap gap-2">
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{exam_id}">{exam_id}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{exam_title}">{exam_title}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_firstname}">{student_firstname}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_surname}">{student_surname}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_firstname_initial}">{student_firstname_initial}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_surname_initial}">{student_surname_initial}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{candidate_number}">{candidate_number}</button>
-                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{submission_id}">{submission_id}</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{exam_id}" data-bs-toggle="tooltip" data-bs-title="{exam_id}">Exam ID</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{exam_title}" data-bs-toggle="tooltip" data-bs-title="{exam_title}">Exam Title</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_firstname}" data-bs-toggle="tooltip" data-bs-title="{student_firstname}">Student First Name</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_surname}" data-bs-toggle="tooltip" data-bs-title="{student_surname}">Student Surname</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_firstname_initial}" data-bs-toggle="tooltip" data-bs-title="{student_firstname_initial}">Student First Initial</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{student_surname_initial}" data-bs-toggle="tooltip" data-bs-title="{student_surname_initial}">Student Surname Initial</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{candidate_number}" data-bs-toggle="tooltip" data-bs-title="{candidate_number}">Candidate Number</button>
+                        <button class="btn btn-outline-secondary btn-sm token-btn" type="button" data-target="edit-folder-template" data-token="{submission_id}" data-bs-toggle="tooltip" data-bs-title="{submission_id}">Submission ID</button>
                     </div>
                 </div>
 
@@ -743,6 +743,10 @@ require __DIR__ . '/../header.php';
             input.value = input.value + token;
             input.focus();
         });
+    });
+
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+        new bootstrap.Tooltip(el);
     });
 </script>
 <?php require __DIR__ . '/../footer.php'; ?>
