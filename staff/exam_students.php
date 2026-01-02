@@ -381,6 +381,7 @@ require __DIR__ . '/../header.php';
                     <label class="form-label">Import from CSV</label>
                     <input class="form-control" type="file" name="student_csv" accept=".csv">
                     <div class="form-text">Required headers: <code>first_name</code>, <code>last_name</code>, <code>candidate_number</code>.</div>
+                    <a class="btn btn-outline-secondary btn-sm mt-2" href="student_register_template.csv" download>Download CSV template</a>
                 </div>
 
                 <div class="mt-4 d-flex gap-2">
