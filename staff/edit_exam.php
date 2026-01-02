@@ -416,10 +416,10 @@ require __DIR__ . '/../header.php';
                 <div class="card border border-primary-subtle shadow-sm bg-primary-subtle mt-4 mb-4">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
                         <div>
-                            <h2 class="h4 mb-1">Student roster</h2>
-                            <p class="text-muted mb-0">Manage the optional student roster and access mode for this exam.</p>
+                            <h2 class="h4 mb-1">Student register</h2>
+                            <p class="text-muted mb-0">Manage the optional student register and access mode for this exam.</p>
                         </div>
-                        <a class="btn btn-outline-primary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Open student roster</a>
+                        <a class="btn btn-outline-primary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Open student register</a>
                     </div>
                 </div>
 

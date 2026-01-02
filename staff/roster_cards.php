@@ -20,7 +20,7 @@ if (!$exam) {
 
 if (empty($exam['student_roster_enabled']) || ($exam['student_roster_mode'] ?? '') !== 'password') {
     http_response_code(400);
-    echo 'Student roster passwords are not enabled for this exam.';
+    echo 'Student register passwords are not enabled for this exam.';
     exit;
 }
 
@@ -40,7 +40,7 @@ $brandText = 'Exams Administration Portal';
 $logoPath = '../logo.png';
 $cssPath = '../style.css';
 $navActions = '<button class="btn btn-outline-primary btn-sm no-print" type="button" onclick="window.print()">Print / Save as PDF</button>'
-    . '<a class="btn btn-outline-secondary btn-sm no-print" href="exam_students.php?id=' . (int) $exam['id'] . '">Back to roster</a>';
+    . '<a class="btn btn-outline-secondary btn-sm no-print" href="exam_students.php?id=' . (int) $exam['id'] . '">Back to register</a>';
 $pageScripts = <<<HTML
 <style>
 @page {

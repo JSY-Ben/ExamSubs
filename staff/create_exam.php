@@ -190,7 +190,7 @@ require __DIR__ . '/../header.php';
             <h1 class="h4">Create Exam</h1>
             <div class="card border-0 bg-light-subtle mt-3 mb-4">
                 <div class="card-body py-3">
-                    <strong>Tip:</strong> You can add a student roster after creating the exam from the Edit Exam screen.
+                    <strong>Tip:</strong> You can add a student register after creating the exam from the Edit Exam screen.
                 </div>
             </div>
 

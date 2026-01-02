@@ -126,7 +126,7 @@ if ($rosterEnabled && count($students) === 0) {
     <main class="container py-5">
         <div class="alert alert-warning shadow-sm">
             <h1 class="h5 mb-2">No student list configured</h1>
-            <p class="mb-3">This exam requires a student roster, but no students have been added yet.</p>
+            <p class="mb-3">This exam requires a student register, but no students have been added yet.</p>
             <a class="btn btn-outline-secondary btn-sm" href="index.php">Back to active exams</a>
         </div>
     </main>

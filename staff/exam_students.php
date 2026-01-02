@@ -275,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rosterMode = ($exam['student_roster_mode'] ?? '') === 'password' ? 'password' : 'menu';
         } catch (Throwable $e) {
             $pdo->rollBack();
-            $errors[] = 'Failed to update the student roster.';
+            $errors[] = 'Failed to update the student register.';
         }
     }
 }
@@ -285,7 +285,7 @@ $stmt->execute([$examId]);
 $students = $stmt->fetchAll();
 $hasPasswords = $rosterEnabled && $rosterMode === 'password' && count($students) > 0;
 
-$pageTitle = 'Student Roster - ' . $exam['title'];
+$pageTitle = 'Student Register - ' . $exam['title'];
 $brandHref = 'index.php';
 $brandText = 'Exams Administration Portal';
 $logoPath = '../logo.png';
@@ -298,14 +298,14 @@ require __DIR__ . '/../header.php';
 <main class="container py-4">
     <div class="card shadow-sm">
         <div class="card-body">
-            <h1 class="h4 mb-2">Student Roster</h1>
+            <h1 class="h4 mb-2">Student Register</h1>
             <p class="text-muted mb-3">Configure the student list and how students identify themselves on the submission page.</p>
             <?php if ($hasPasswords): ?>
                 <a class="btn btn-outline-primary btn-sm mb-3" href="roster_cards.php?id=<?php echo (int) $exam['id']; ?>">Printable student cards (PDF)</a>
             <?php endif; ?>
 
             <?php if ($success): ?>
-                <div class="alert alert-success">Student roster updated.</div>
+                <div class="alert alert-success">Student register updated.</div>
             <?php endif; ?>
 
             <?php if (count($errors) > 0): ?>
@@ -319,7 +319,7 @@ require __DIR__ . '/../header.php';
             <form method="post" enctype="multipart/form-data">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" name="roster_enabled" id="roster-enabled" value="1" <?php echo $rosterEnabled ? 'checked' : ''; ?>>
-                    <label class="form-check-label" for="roster-enabled">Enable roster for this exam</label>
+                    <label class="form-check-label" for="roster-enabled">Enable register for this exam</label>
                 </div>
 
                 <div class="mt-3">
@@ -384,7 +384,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 d-flex gap-2">
-                    <button class="btn btn-primary" type="submit">Save roster</button>
+                    <button class="btn btn-primary" type="submit">Save register</button>
                     <a class="btn btn-outline-secondary" href="exam.php?id=<?php echo (int) $exam['id']; ?>">Back to exam</a>
                 </div>
             </form>

@@ -233,7 +233,7 @@ if ($rosterEnabled) {
             <p class="text-muted">Window: <?php echo e(format_datetime_display($exam['start_time'])); ?> to <?php echo e(format_datetime_display($exam['end_time'])); ?></p>
             <p class="text-muted">Buffers: <?php echo (int) $exam['buffer_pre_minutes']; ?> mins before, <?php echo (int) $exam['buffer_post_minutes']; ?> mins after</p>
             <?php if (!empty($exam['student_roster_enabled'])): ?>
-                <p class="text-muted">Student roster: <?php echo ($exam['student_roster_mode'] ?? '') === 'password' ? 'Password' : 'Menu'; ?></p>
+                <p class="text-muted">Student register: <?php echo ($exam['student_roster_mode'] ?? '') === 'password' ? 'Password' : 'Menu'; ?></p>
             <?php endif; ?>
             <?php if (!empty($exam['is_completed'])): ?>
                 <span class="badge text-bg-success">Completed</span>
@@ -252,7 +252,7 @@ if ($rosterEnabled) {
                 </form>
             <?php endif; ?>
             <a class="btn btn-outline-secondary btn-sm" href="edit_exam.php?id=<?php echo (int) $exam['id']; ?>">Edit exam</a>
-            <a class="btn btn-outline-secondary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Student roster</a>
+            <a class="btn btn-outline-secondary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Student register</a>
             <a class="btn btn-outline-secondary btn-sm" href="archives.php?id=<?php echo (int) $exam['id']; ?>">Archived submissions</a>
             <?php if ($hasFiles): ?>
                 <a class="btn btn-outline-primary btn-sm" href="download_exam.php?exam_id=<?php echo (int) $exam['id']; ?>">Download all submissions</a>
