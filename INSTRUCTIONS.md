@@ -36,7 +36,7 @@ By default, when students access an exam, it will let anyone access the exam in 
 ### Access an exam
 1. Open the student portal.
 2. Select the exam and click "Submit Files".
-3. If prompted, enter the exam access password and/or your student password provided from the roster.
+3. If prompted, enter the exam access password and/or your student password provided from the roster. If the student is on a roster, it will log when the student has downloaded the exam materials in the Administration section.
 
 ### Download exam materials
 1. On the student portal, use "Download Exam Materials" on the exam card.
