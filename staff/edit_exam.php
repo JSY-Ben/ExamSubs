@@ -376,7 +376,7 @@ require __DIR__ . '/../header.php';
                 <input type="hidden" name="delete_confirmed" id="delete-confirmed" value="0">
                 <input type="hidden" name="delete_documents" id="delete-documents" value="">
                 <div class="mt-2 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Details</h2>
+                    <h2 class="h4 mb-2">Exam Details</h2>
                     <div class="mb-3">
                         <label class="form-label">Exam ID</label>
                         <input class="form-control" type="text" name="exam_code" value="<?php echo e((string) $exam['exam_code']); ?>" required>
@@ -389,7 +389,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Schedule & Buffers</h2>
+                    <h2 class="h4 mb-2">Schedule & Buffers</h2>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Start Time</label>
@@ -416,7 +416,7 @@ require __DIR__ . '/../header.php';
                 <div class="card border border-primary-subtle shadow-sm bg-primary-subtle mt-4 mb-4">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
                         <div>
-                            <h2 class="h5 mb-1">Student roster</h2>
+                            <h2 class="h4 mb-1">Student roster</h2>
                             <p class="text-muted mb-0">Manage the optional student roster and access mode for this exam.</p>
                         </div>
                         <a class="btn btn-outline-primary btn-sm" href="exam_students.php?id=<?php echo (int) $exam['id']; ?>">Open student roster</a>
@@ -424,7 +424,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Required Documents</h2>
+                    <h2 class="h4 mb-2">Required Documents</h2>
                     <div id="document-list" class="d-grid gap-2">
                         <?php foreach ($documents as $doc): ?>
                             <div class="border rounded p-3">
@@ -498,7 +498,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Submission Naming</h2>
+                    <h2 class="h4 mb-2">Submission Naming</h2>
                     <label class="form-label">Submitted Document Naming Convention</label>
                     <input class="form-control" type="text" name="file_name_template" id="edit-file-template" value="<?php echo e((string) ($exam['file_name_template'] ?? '')); ?>" placeholder="{candidate_number}_{document_title}_{original_name}">
                     <div class="form-text">Example: {candidate_number}_{document_title}_{original_name}</div>
@@ -533,7 +533,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Materials</h2>
+                    <h2 class="h4 mb-2">Exam Materials</h2>
                     <?php if (count($examFiles) === 0): ?>
                         <p class="text-muted mb-2">No exam materials uploaded.</p>
                     <?php else: ?>
@@ -566,7 +566,7 @@ require __DIR__ . '/../header.php';
                     <?php endif; ?>
 
                     <div class="mt-3">
-                        <h3 class="h6 text-uppercase fw-bold mb-2">Add New Exam Materials</h3>
+                        <h3 class="h5 mb-2">Add New Exam Materials</h3>
                         <div id="new-exam-files-list" class="d-grid gap-2">
                             <div class="border rounded p-3">
                                 <div class="row g-2">
@@ -587,7 +587,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Access Settings</h2>
+                    <h2 class="h4 mb-2">Access Settings</h2>
                     <label class="form-label">Exam Access Password</label>
                     <input class="form-control" type="password" name="exam_password" autocomplete="new-password" placeholder="Set a new password">
                     <div class="form-text">

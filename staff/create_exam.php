@@ -204,7 +204,7 @@ require __DIR__ . '/../header.php';
 
             <form method="post" enctype="multipart/form-data">
                 <div class="mt-2 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Details</h2>
+                    <h2 class="h4 mb-2">Exam Details</h2>
                     <div class="mb-3">
                         <label class="form-label">Exam ID</label>
                         <input class="form-control" type="text" name="exam_code" placeholder="EXAM-2024-01" required>
@@ -219,7 +219,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Schedule & Buffers</h2>
+                    <h2 class="h4 mb-2">Schedule & Buffers</h2>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Start Date</label>
@@ -269,7 +269,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Required Documents</h2>
+                    <h2 class="h4 mb-2">Required Documents</h2>
                     <div id="document-list" class="d-grid gap-2">
                         <div class="border rounded p-3">
                             <div class="row g-2">
@@ -299,7 +299,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Submission Naming</h2>
+                    <h2 class="h4 mb-2">Submission Naming</h2>
                     <label class="form-label">Submitted Document Naming Convention</label>
                     <input class="form-control" type="text" name="file_name_template" id="create-file-template" placeholder="{candidate_number}_{document_title}_{original_name}">
                     <div class="form-text">Example: {candidate_number}_{document_title}_{original_name}</div>
@@ -334,7 +334,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4 pb-4 border-bottom">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Exam Materials (optional)</h2>
+                    <h2 class="h4 mb-2">Exam Materials (optional)</h2>
                     <div id="exam-files-list" class="d-grid gap-2">
                         <div class="border rounded p-3">
                             <div class="row g-2">
@@ -354,7 +354,7 @@ require __DIR__ . '/../header.php';
                 </div>
 
                 <div class="mt-4">
-                    <h2 class="h6 text-uppercase fw-bold mb-2">Access Settings</h2>
+                    <h2 class="h4 mb-2">Access Settings</h2>
                     <label class="form-label">Exam Access Password (optional)</label>
                     <input class="form-control" type="password" name="exam_password" autocomplete="new-password">
                     <div class="form-text">Leave blank to allow direct access without a password.</div>
