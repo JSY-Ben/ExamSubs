@@ -21,7 +21,7 @@ This guide explains how students access exams, download materials, and submit th
 5. Click "Submit Files".
 
 ## Replace a submission
-- If a submission already exists, the portal will warn you.
+- If a submission already exists under your name, the portal will warn you.
 - Confirm the replacement checkbox to submit again and replace your original submission. Your original submission will be archived but it will not be graded.
 
 ## Cancel a submission
