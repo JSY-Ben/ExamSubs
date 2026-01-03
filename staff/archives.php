@@ -93,6 +93,7 @@ $logoPath = '../logo.png';
 $cssPath = '../style.css';
 $navActions = '<a class="btn btn-outline-secondary btn-sm" href="../index.php">Student View</a>'
     . '<a class="btn btn-outline-secondary btn-sm" href="exam.php?id=' . (int) $exam['id'] . '">Back to exam</a>'
+    . '<a class="btn btn-outline-primary btn-sm" href="help.php">Help</a>'
     . '<a class="btn btn-outline-secondary btn-sm" href="../auth/logout.php">Logout</a>';
 require __DIR__ . '/../header.php';
 ?>

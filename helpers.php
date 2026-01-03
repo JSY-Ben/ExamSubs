@@ -7,6 +7,102 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+function render_markdown_basic(string $markdown): string
+{
+    $lines = preg_split("/\\r\\n|\\r|\\n/", $markdown);
+    $html = '';
+    $inParagraph = false;
+    $inUnordered = false;
+    $inOrdered = false;
+
+    $closeParagraph = function () use (&$html, &$inParagraph): void {
+        if ($inParagraph) {
+            $html .= "</p>\n";
+            $inParagraph = false;
+        }
+    };
+    $closeLists = function () use (&$html, &$inUnordered, &$inOrdered): void {
+        if ($inUnordered) {
+            $html .= "</ul>\n";
+            $inUnordered = false;
+        }
+        if ($inOrdered) {
+            $html .= "</ol>\n";
+            $inOrdered = false;
+        }
+    };
+
+    foreach ($lines as $line) {
+        $trimmed = trim((string) $line);
+        if ($trimmed === '') {
+            $closeParagraph();
+            $closeLists();
+            continue;
+        }
+
+        if (preg_match('/^(#{1,6})\\s+(.*)$/', $trimmed, $matches)) {
+            $closeParagraph();
+            $closeLists();
+            $level = strlen($matches[1]);
+            $text = e(trim($matches[2]));
+            $html .= sprintf("<h%d>%s</h%d>\n", $level, $text, $level);
+            continue;
+        }
+
+        if (preg_match('/^\\d+\\.\\s+(.*)$/', $trimmed, $matches)) {
+            $closeParagraph();
+            if (!$inOrdered) {
+                $html .= "<ol>\n";
+                $inOrdered = true;
+            }
+            if ($inUnordered) {
+                $html .= "</ul>\n";
+                $inUnordered = false;
+            }
+            $html .= '<li>' . e($matches[1]) . "</li>\n";
+            continue;
+        }
+
+        if (preg_match('/^[-*]\\s+(.*)$/', $trimmed, $matches)) {
+            $closeParagraph();
+            if (!$inUnordered) {
+                $html .= "<ul>\n";
+                $inUnordered = true;
+            }
+            if ($inOrdered) {
+                $html .= "</ol>\n";
+                $inOrdered = false;
+            }
+            $html .= '<li>' . e($matches[1]) . "</li>\n";
+            continue;
+        }
+
+        if ($inOrdered || $inUnordered) {
+            $closeLists();
+        }
+
+        $text = e($trimmed);
+        if (!$inParagraph) {
+            $html .= '<p>' . $text;
+            $inParagraph = true;
+        } else {
+            $html .= ' ' . $text;
+        }
+    }
+
+    if ($inParagraph) {
+        $html .= "</p>\n";
+    }
+    if ($inUnordered) {
+        $html .= "</ul>\n";
+    }
+    if ($inOrdered) {
+        $html .= "</ol>\n";
+    }
+
+    return $html;
+}
+
 function now_utc_string(): string
 {
     return (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');

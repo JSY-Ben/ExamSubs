@@ -32,7 +32,7 @@ if (!$exam || !exam_is_active($exam, $now)) {
     $brandText = 'Exams Submission Portal';
     $logoPath = 'logo.png';
     $cssPath = 'style.css';
-    $navActions = '';
+    $navActions = '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
     require __DIR__ . '/header.php';
     ?>
     <main class="container py-5">
@@ -70,7 +70,7 @@ if ($requiresPassword && !$hasAccess) {
     $brandText = 'Exams Submission Portal';
     $logoPath = 'logo.png';
     $cssPath = 'style.css';
-    $navActions = '';
+    $navActions = '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
     require __DIR__ . '/header.php';
     ?>
     <main class="container py-5">
@@ -120,7 +120,7 @@ if ($rosterEnabled && count($students) === 0) {
     $brandText = 'Exams Submission Portal';
     $logoPath = 'logo.png';
     $cssPath = 'style.css';
-    $navActions = '';
+    $navActions = '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
     require __DIR__ . '/header.php';
     ?>
     <main class="container py-5">
@@ -178,7 +178,7 @@ if ($rosterEnabled && $rosterMode === 'password') {
         $brandText = 'Exams Submission Portal';
         $logoPath = 'logo.png';
         $cssPath = 'style.css';
-        $navActions = '';
+        $navActions = '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
         require __DIR__ . '/header.php';
         ?>
         <main class="container py-5">
@@ -295,7 +295,7 @@ $brandHref = 'index.php';
 $brandText = 'Exams Submission Portal';
 $logoPath = 'logo.png';
 $cssPath = 'style.css';
-$navActions = '';
+$navActions = '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
 require __DIR__ . '/header.php';
 ?>
 <main class="container py-4">

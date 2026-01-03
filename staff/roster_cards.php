@@ -40,7 +40,8 @@ $brandText = 'Exams Administration Portal';
 $logoPath = '../logo.png';
 $cssPath = '../style.css';
 $navActions = '<button class="btn btn-outline-primary btn-sm no-print" type="button" onclick="window.print()">Print / Save as PDF</button>'
-    . '<a class="btn btn-outline-secondary btn-sm no-print" href="exam_students.php?id=' . (int) $exam['id'] . '">Back to register</a>';
+    . '<a class="btn btn-outline-secondary btn-sm no-print" href="exam_students.php?id=' . (int) $exam['id'] . '">Back to register</a>'
+    . '<a class="btn btn-outline-primary btn-sm no-print" href="help.php">Help</a>';
 $pageScripts = <<<HTML
 <style>
 @page {

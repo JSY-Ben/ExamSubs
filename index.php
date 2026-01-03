@@ -49,7 +49,8 @@ $brandHref = 'index.php';
 $brandText = 'Exams Submission Portal';
 $logoPath = 'logo.png';
 $cssPath = 'style.css';
-$navActions = '<a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Exam Administration</a>';
+$navActions = '<a class="btn btn-outline-secondary btn-sm" href="staff/index.php">Exam Administration</a>'
+    . '<a class="btn btn-outline-primary btn-sm" href="student_help.php">Help</a>';
 $preauthErrors = $_SESSION['preauth_exam_error'] ?? [];
 if (isset($_SESSION['preauth_exam_error'])) {
     unset($_SESSION['preauth_exam_error']);
