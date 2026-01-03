@@ -15,7 +15,7 @@ This guide explains how students access exams, download materials, and submit th
 
 ## Once the exam page has loaded
 1. Enter your name and candidate number (or select your name from the dropdown menu if there is one instead of a text box). If a password has been provided you for submission, your name will be automatically filled in for you already.
-2. Each document that is requested for you to submit for this exam has its own file upload box. Upload the required documents.
+2. Each document that is requested for you to submit for this exam has its own file upload box. Upload the required documents. If you haven't managed to complete an activity, you are able to submit the exam without uploading one of the files, however you will be warned about this when you try to submit without uploading all the files.
 3. When a document is uploaded, it will tell you when the document was last saved/modified. If the date/time displayed is earlier than the date/time you last worked on the file, it is possible you didn't save or upload the latest version. Make sure to check before you submit. You can remove the file and upload the latest version if necessary.
 4. Click the checkbox to confirm you are ready to submit the files uploaded as your final submission.
 5. Click "Submit Files".
