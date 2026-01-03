@@ -46,12 +46,13 @@ By default, when students access an exam, it will let anyone access the exam in 
 ### Submit files
 1. Enter your name and candidate number (or select your name if register mode is enabled). If a password has been provided per student, their name will be automatically filled in.
 2. Upload the required documents.
-3. Confirm the final submission checkbox.
+3. When a document is uploaded, it will tell you when the document was last saved/modified. If the date/time displayed is earlier than the date/time you last worked on the file, it is possible you didn't save or upload the latest version. Make sure to check before you submit. You can remove the file and upload the latest version if necessary.
+3. Click the checkbox to confirm you are ready to submit the files uploaded as your final submission.
 4. Click "Submit Files".
 
 ### Replace a submission
 - If a submission already exists, the portal will warn you.
-- Confirm the replacement checkbox to submit again.
+- Confirm the replacement checkbox to submit again and replace your original submission. Your original submission will be archived but it will not be graded.
 
 ### Cancel a submission
 - Use "Cancel submission" to return to the exam list.
