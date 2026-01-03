@@ -80,7 +80,7 @@ if ($lastModifiedMs > 0) {
     $lastModifiedTs = (int) floor($lastModifiedMs / 1000);
     if ($lastModifiedTs > 0) {
         $modified = (new DateTimeImmutable('@' . $lastModifiedTs))->setTimezone(new DateTimeZone(date_default_timezone_get()));
-        $lastModifiedDisplay = $modified->format('Y-m-d H:i:s');
+        $lastModifiedDisplay = $modified->format('d/m/Y g:i A');
         $lastModifiedWarning = (time() - $lastModifiedTs) > 3600;
     }
 }

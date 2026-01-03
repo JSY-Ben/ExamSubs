@@ -392,7 +392,7 @@ require __DIR__ . '/header.php';
                                 <?php endif; ?>
                                 <?php if (is_array($prefillInfo) && !empty($prefillInfo['last_modified_display'])): ?>
                                     <div class="form-text <?php echo !empty($prefillInfo['last_modified_warning']) ? 'text-warning' : 'text-muted'; ?>">
-                                        Last modified: <?php echo e($prefillInfo['last_modified_display']); ?>
+                                        This file was last updated at: <?php echo e($prefillInfo['last_modified_display']); ?>
                                     </div>
                                 <?php endif; ?>
                             <?php endif; ?>
@@ -660,7 +660,7 @@ require __DIR__ . '/header.php';
                                 status.classList.remove('d-none');
                             }
                             if (modified && response.last_modified_display) {
-                                modified.textContent = `Last modified: ${response.last_modified_display}`;
+                                modified.textContent = `This file was last updated at: ${response.last_modified_display}`;
                                 modified.classList.remove('d-none');
                                 if (response.last_modified_warning) {
                                     modified.classList.add('text-warning');
