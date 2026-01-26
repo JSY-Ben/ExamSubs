@@ -1,10 +1,16 @@
-# ExamSubs
+# ExamSubs - A PHP/MySQL Online platform for delivery and submission of Materials for Online Exams
+
+## Donations
+
+While i will always provide my software for free, donations are extremely helpful for allowing me to continue making these apps, so any donation would be appreciated:
 
 [![Donate with PayPal to help me continue developing these apps!](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?business=5TRANVZF49AN6&no_recurring=0&item_name=Thank+you+for+any+donations%21+It+will+help+me+put+money+into+the+tools+I+use+to+develop+my+apps+and+services.&currency_code=GBP)
 
-Please note - this app is still in an alpha stage of development as a product. It has been built for production on a single site and has been working without issue, however please consider this an in-development product for now. Please do try it, report issues and request features, but consider it unsuitable for a production environment until any bugs have been ironed out.
-
 ![531106866-7c2a07ef-3b3a-4811-98c7-a3bf7c71e8e1](https://github.com/user-attachments/assets/ee677b19-3e40-4cc0-ac53-af3b8b0ae83b)
+
+# Introduction 
+
+- Please note - this app is still in an alpha stage of development as a product. It has been built for production on a single site and has been working without issue, however please consider this an in-development product for now. Please do try it, report issues and request features, but consider it unsuitable for a production environment until any bugs have been ironed out.
 
 
 ExamSubs is a lightweight PHP/MySQL web portal for managing exam submissions for an education institution. Students can upload required files through a simple form, while staff can define exams, including what files and file types are expected to be submitted, collect submissions, and review uploaded materials from a dedicated dashboard. The system keeps uploads organised by exam and submission to make retrieval and auditing straightforward.
